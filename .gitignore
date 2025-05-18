@@ -52,3 +52,7 @@ node_modules/
 
 # Coverage/test
 .coverage
+
+# Ignore empty migrations folder
+app/migrations/
+!app/migrations/__init__.py
