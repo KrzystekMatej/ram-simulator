@@ -1,0 +1,8 @@
+R2 = READ()
+R1 = 2
+goto 5
+R1 = R1 * R1
+R2 = R2 - 1
+if (R2 > 0) goto 3
+WRITE(R1)
+halt
