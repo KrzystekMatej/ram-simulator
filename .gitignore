@@ -22,7 +22,7 @@ var/
 .installed.cfg
 *.egg
 
-# Django stuff:
+# Django
 *.log
 *.pot
 db.sqlite3
@@ -56,3 +56,6 @@ node_modules/
 # Ignore empty migrations folder
 app/migrations/
 !app/migrations/__init__.py
+
+# Jest
+coverage/
