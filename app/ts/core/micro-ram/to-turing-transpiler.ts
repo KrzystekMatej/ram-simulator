@@ -3,7 +3,7 @@ import { TapeCondition, TapeAction, Instruction as TuringInstruction } from '../
 import { Move } from '../tape/move'
 import { TapeSymbol } from '../tape/symbol';
 import { TapeId } from '../turing/tape-id';
-import { logSeparator, IntToMinimalTwosComplement } from '../../utils/utils';
+import { logSeparator, IntToMinimalTwosComplement } from '../../utils';
 
 const cond = (tape: TapeId, ...symbols: TapeSymbol[]): [TapeId, TapeCondition] => [tape, TapeCondition.multiple(symbols)];
 const tapeAct = (target: TapeId, source: TapeId, move: Move): [TapeId, TapeAction] => [target, TapeAction.fromTape(source, move)];
@@ -90,7 +90,19 @@ export class ToTuringTranspiler {
             let turingSet: Map<string, TuringInstruction[]> = new Map();
 
             const twosComplement: string = IntToMinimalTwosComplement(constant);
-            turingSet.set('start', [TuringInstruction.createNop('write_0')]);
+            turingSet.set('start', [TuringInstruction.createNop('left_shift_a')]);
+            turingSet.set('left_shift_a', [
+                TuringInstruction.createFromOrderedEntries(
+                    'left_shift_a',
+                     [cond(TapeId.A, TapeSymbol.Zero, TapeSymbol.One)],
+                      [tapeAct(TapeId.A, TapeId.A, Move.Left)]
+                ),
+                TuringInstruction.createFromOrderedEntries(
+                    'write_0',
+                    [cond(TapeId.A, TapeSymbol.End)],
+                    [litAct(TapeId.A, TapeSymbol.End, Move.Right)]
+                )
+            ]);
             for (let i = 0; i < twosComplement.length; i++) {
                 let write = litAct(TapeId.A, twosComplement[i] as TapeSymbol, Move.Right);
                 turingSet.set(`write_${i}`, [TuringInstruction.createFromOrderedEntries(`write_${i+1}`, [], [write])]);

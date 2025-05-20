@@ -4,7 +4,7 @@ import { ToTuringTranspiler as RamToTuringTranspiler } from "../../core/micro-ra
 import { Instruction as TuringInstruction } from "../../core/turing/instruction";
 import { Machine as TuringMachine } from "../../core/turing/machine";
 import { TapeId } from "../../core/turing/tape-id";
-import { arraysEqual } from "../utils";
+import { arraysEqual, mapsEqual } from "../../utils";
 
 export class SimulationError extends Error {
     constructor(message: string) {
@@ -60,10 +60,11 @@ export class SimulationTester {
     }
 
     areMachineStatesConsistent() : boolean {
-        return this.turingMachine.getRegisterContents(TapeId.A) === this.ramMachine.A &&
+        return (this.turingMachine.state === `${this.ramMachine.ip}_start` || (this.turingMachine.state.includes("halt") && this.ramMachine.ip === -1)) &&
+            this.turingMachine.getRegisterContents(TapeId.A) === this.ramMachine.A &&
             this.turingMachine.getRegisterContents(TapeId.B) === this.ramMachine.B &&
             this.turingMachine.getRegisterContents(TapeId.C) === this.ramMachine.C &&
-            arraysEqual(this.turingMachine.getMemoryContents(), Array.from(this.ramMachine.memory.entries()), (x, y) => x[0] === y[0] && x[1] === y[1]) &&
+            mapsEqual(this.turingMachine.getMemoryContents(), this.ramMachine.memory) &&
             arraysEqual(this.turingMachine.getIOTapeContents(TapeId.I), this.ramMachine.input.getFullContents(0)[1] as number[]) &&
             arraysEqual(this.turingMachine.getIOTapeContents(TapeId.O), this.ramMachine.output.getFullContents(0)[1] as number[]);
     }
@@ -74,18 +75,18 @@ export class SimulationTester {
         while (true) {
             let num = this.ramMachine.ip
             let instruction = this.instructions[num];
+
             console.log(`-------------------- Instruction ${num} -------------------`);
             this.executeRamInstruction();
             console.log(`-------------------- Instruction ${num} -------------------`);
+
+             if (!this.areMachineStatesConsistent())
+                throw new SimulationError(`Machine states are not consistent after instruction ${this.ramMachine.ip}: ${instruction.toString()}`);
 
             if (instruction.id === RamInstructionId.Halt) {
                 this.initialized = false;
                 return;
             }
-
-
-            if (!this.areMachineStatesConsistent())
-                throw new SimulationError(`Machine states are not consistent after instruction ${this.ramMachine.ip}: ${instruction.toString()}`);
         }
     }
 }

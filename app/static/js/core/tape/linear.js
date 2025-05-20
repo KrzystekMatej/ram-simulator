@@ -1,46 +1,38 @@
 import { Tape } from './tape';
-import { Move } from "./move";
-
-export class LinearTape<T> extends Tape<T> {
-    private tape: T[] = [];
-    private zeroOffset: number = 0;
-
-    override write(symbol: T) : void {
+export class LinearTape extends Tape {
+    constructor() {
+        super(...arguments);
+        this.tape = [];
+        this.zeroOffset = 0;
+    }
+    write(symbol) {
         let tapePosition = this.zeroOffset + this.head;
-
         while (tapePosition < 0) {
             this.tape.unshift(this.undefinedSymbol);
             this.zeroOffset++;
             tapePosition++;
         }
-
         while (tapePosition >= this.tape.length) {
             this.tape.push(this.undefinedSymbol);
         }
-
         this.tape[tapePosition] = symbol;
     }
-
-    override peek(position: number): T {
+    peek(position) {
         let tapePosition = this.zeroOffset + position;
-
         if (tapePosition < 0 || tapePosition >= this.tape.length) {
             return this.undefinedSymbol;
         }
         return this.tape[tapePosition];
     }
-
-    override getFullContents(padding: number): [number, T[]] {
+    getFullContents(padding) {
         return [this.head, this.getSegments(0, padding, this.tape.length - 1 + padding)];
     }
-
-    override reset(): void {
+    reset() {
         super.reset();
         this.tape = [];
         this.zeroOffset = 0;
     }
-
-    load(tape: T[]): void {
+    load(tape) {
         this.tape = tape;
         this.head = 0;
     }

@@ -28,9 +28,17 @@ export class Machine {
             this.C = this.A;
         },
         function load() {
-            const val = this.memory.get(this.A) ?? 0;
-            console.log(`A = [${this.A}] = ${val}`);
+            let val: number;
+            if (this.memory.has(this.A)) {
+                val = this.memory.get(this.A) as number;
+            }
+            else {
+                val = 0;
+                this.memory.set(this.A, val);
+            }
             this.A = val;
+
+            console.log(`A = [${this.A}] = ${val}`);
         },
         function store() {
             console.log(`[${this.C}] = A (${this.A})`);

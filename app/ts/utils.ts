@@ -68,3 +68,15 @@ export function twosComplementToInt(bin: string): number {
     }
     return value
 }
+
+export function mapsEqual<K, V>(a: Map<K, V>, b: Map<K, V>, valueEqual: (x: V, y: V) => boolean = (x, y) => x === y): boolean {
+    if (a.size !== b.size) return false;
+
+    for (const [key, aValue] of a) {
+        if (!b.has(key)) return false;
+        const bValue = b.get(key)!;
+        if (!valueEqual(aValue, bValue)) return false;
+    }
+
+    return true;
+}
