@@ -1,4 +1,9 @@
-import {Instruction, InstructionId} from './instruction';
+import {
+    Instruction as RamInstruction,
+    Instruction,
+    InstructionId as RamInstructionId,
+    InstructionId
+} from './instruction';
 import {LinearTape} from '../tape/linear'
 import {Move} from '../tape/move';
 
@@ -18,6 +23,14 @@ export class Machine {
     current:  Instruction = new Instruction(InstructionId.Halt);
 
     static readonly handlers: ((this: Machine, ...args: any[]) => void)[] = [
+        function init(...inputs: number[]) {
+            console.log(`init`);
+            inputs.forEach((value) => {
+                this.input.write(value);
+                this.input.move(Move.Right);
+            });
+            this.input.seek(0);
+        },
         function assignConst(value: number) {
             console.log(`A = ${value}`);
             this.A = value;
@@ -94,24 +107,15 @@ export class Machine {
         }
     ];
 
-    initialize(program: Instruction[], inputs: number[]) : void {
+    initialize(program: Instruction[]) : void {
         this.reset();
         this.setProgram(program);
-        this.initInputs(inputs);
         this.current = this.program[this.ip];
     }
 
     setProgram(program: Instruction[]) : void {
         this.program.length = 0;
         this.program.push(...program);
-    }
-
-    initInputs(inputs: number[]) : void {
-        inputs.forEach((value) => {
-            this.input.write(value);
-            this.input.move(Move.Right);
-        });
-        this.input.seek(0);
     }
 
     executeProgram() {
@@ -122,7 +126,7 @@ export class Machine {
     }
 
     next() : Instruction {
-        if (this.current.id === InstructionId.Halt) return this.current;
+        if (this.current.id === InstructionId.Halt && this.ip >= this.program.length) return this.current;
         this.ip++;
         this.current = this.program[this.ip];
         return this.current;
@@ -149,5 +153,6 @@ export class Machine {
         this.input.reset();
         this.output.reset();
         this.program.length = 0;
+        this.current = new Instruction(InstructionId.Halt);
     }
 }

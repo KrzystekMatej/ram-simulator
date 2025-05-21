@@ -75,12 +75,11 @@ export class Machine {
         return memory;
     }
 
-    initialize(initProgram: Map<string, Instruction[]>, startProgram: Map<string, Instruction[]>): void {
+    initialize(initProgram: Map<string, Instruction[]>): void {
         this.reset();
-        this.state = "start";
         this.setProgram(initProgram);
-        this.executeProgram();
-        this.setProgram(startProgram);
+        this.state = "0_start";
+        this.current = this.getSatisfied();
     }
 
     setProgram(program: Map<string, Instruction[]>): void {
@@ -88,27 +87,31 @@ export class Machine {
         program.forEach((value, key) => {
             this.program.set(key, value);
         });
-        this.next();
     }
 
     executeProgram(): void {
         if (this.state.includes("halt")) return;
 
-        do {
+        while (!this.state.includes("halt")) {
             this.execute();
+            if (this.current.target.includes('start')) return;
             this.next();
-        } while (!(this.state.includes("start") || this.state.includes("halt")))
+        }
     }
 
     next(): Instruction {
         if (this.state.includes("halt")) return this.current;
 
+        this.state = this.current.target;
+        this.current = this.getSatisfied();
+        return this.current;
+    }
+
+    getSatisfied(): Instruction {
         let stateInstructions: TuringInstruction[] = this.program.get(this.state) as TuringInstruction[];
 
         for (const instruction of stateInstructions) {
             if (this.isSatisfied(instruction)) {
-                this.current = instruction;
-                this.state = this.current!.target;
                 return instruction;
             }
         }
@@ -138,8 +141,8 @@ export class Machine {
     execute(): void {
         let headReads = this.getHeadReads();
 
-         for (let i = 0; i < this.current!.actions.length; i++) {
-            const action = this.current!.actions[i];
+         for (let i = 0; i < this.current.actions.length; i++) {
+            const action = this.current.actions[i];
             this.executeAction(i, action, headReads);
         }
     }

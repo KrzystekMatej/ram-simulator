@@ -85,6 +85,9 @@ export class ToTuringTranspiler {
     }
 
     static readonly handlers: ((this: ToTuringTranspiler, ...args: any[]) => Map<string, TuringInstruction[]>)[] = [
+        function init(...inputs: number[]) {
+            return this.getInitializationSet(inputs);
+        },
         function assignConst(constant: number) {
             console.log('transpile: assignConst');
             let turingSet: Map<string, TuringInstruction[]> = new Map();
@@ -206,7 +209,7 @@ export class ToTuringTranspiler {
 
         if (inputs.length <= 0)
         {
-            turingSet.set('input', [TuringInstruction.createNop('0_start')]);
+            turingSet.set('input', [TuringInstruction.createNop('next')]);
             return turingSet;
         }
 
@@ -235,7 +238,7 @@ export class ToTuringTranspiler {
                 [tapeAct(TapeId.I, TapeId.I, Move.Left)]
             ),
             TuringInstruction.createFromOrderedEntries(
-                '0_start',
+                'next',
                 [cond(TapeId.I, TapeSymbol.Blank)],
                 [tapeAct(TapeId.I, TapeId.I, Move.Right)]
             )

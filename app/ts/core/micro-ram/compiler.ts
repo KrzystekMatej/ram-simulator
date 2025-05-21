@@ -16,6 +16,29 @@ export class Compiler {
 
     private parseInstruction(line: string): Instruction {
         switch (true) {
+            case line.startsWith('init'): {
+                const prefix = 'init';
+                const rest = line.slice(prefix.length).trim();
+                if (!rest.startsWith('[') || !rest.endsWith(']')) {
+                    throw new Error('Invalid init format: missing brackets');
+                }
+
+                const contents = rest.slice(1, -1).trim();
+                if (contents.length === 0) {
+                    return new Instruction(InstructionId.Init, []);
+                }
+
+                const parts = contents.split(',').map(s => s.trim());
+                const numbers = parts.map(s => {
+                    const n = Number(s);
+                    if (!Number.isInteger(n)) {
+                        throw new Error(`Invalid number in init list: '${s}'`);
+                    }
+                    return n;
+                });
+
+                return new Instruction(InstructionId.Init, numbers);
+            }
             case /^A\s*=\s*\d+$/.test(line): {
                 const match = line.match(/^A\s*=\s*(\d+)$/);
                 return new Instruction(InstructionId.AssignConst, [parseInt(match![1])]);

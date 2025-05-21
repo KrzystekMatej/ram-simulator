@@ -18,18 +18,20 @@ export class RamSimulator {
     transpiler: RamToTuringTranspiler = new RamToTuringTranspiler();
     turingMachine: TuringMachine = new TuringMachine();
     initialized: boolean = false;
+    checkConsistency: boolean = false;
 
-    constructor(turingSets: string) {
+    constructor(turingSets: string, checkConsistency: boolean = false) {
         this.transpiler.initialize(turingSets);
+        this.checkConsistency = checkConsistency;
     }
 
-    initialize(instructions: RamInstruction[], inputs: number[]) : void {
-        this.ramMachine.initialize(instructions.concat([new RamInstruction(RamInstructionId.Halt, [])]), inputs);
-        this.turingMachine.initialize(this.transpiler.getInitializationSet(inputs), this.transpiler.transpile(this.ramMachine.current, this.ramMachine.ip));
+    initialize(instructions: RamInstruction[]) : void {
+        this.ramMachine.initialize(instructions);
+        this.turingMachine.initialize(this.transpiler.transpile(this.ramMachine.current, this.ramMachine.ip));
         this.initialized = true;
     }
 
-    ramNext(executeTuring: boolean = true) : RamInstruction {
+    ramStep(executeTuring: boolean = true) : RamInstruction {
         if (!this.initialized) throw new SimulationError("Tester is not initialized!");
 
         this.ramMachine.execute();
@@ -37,16 +39,17 @@ export class RamSimulator {
 
         const instruction = this.ramMachine.next();
         this.turingMachine.setProgram(this.transpiler.transpile(instruction, this.ramMachine.ip));
+        this.turingMachine.next();
         return instruction;
     }
 
-    turingNext() : TuringInstruction {
+    turingStep() : TuringInstruction {
         if (!this.initialized) throw new SimulationError("Tester is not initialized!");
 
         this.turingMachine.execute();
 
-        if (this.turingMachine.state.includes("start")) {
-            this.ramNext(false);
+        if (this.turingMachine.current.target.includes("start")) {
+            this.ramStep(false);
             return this.turingMachine.current;
         }
 
@@ -63,16 +66,16 @@ export class RamSimulator {
             arraysEqual(this.turingMachine.getIOTapeContents(TapeId.O), this.ramMachine.output.getFullContents(0)[1] as number[]);
     }
 
-    executeAll(checkConsistency : boolean = true) : void {
+    executeAll() : void {
         if (!this.initialized) throw new SimulationError("Tester is not initialized!");
 
         while (true) {
-            const instruction = this.ramNext()
+            const instruction = this.ramStep();
 
-            if (checkConsistency && !this.areMachineStatesConsistent())
+            if (this.checkConsistency && !this.areMachineStatesConsistent())
                 throw new SimulationError(`Machine states are not consistent after instruction ${this.ramMachine.ip}: ${instruction.toString()}`);
 
-            if (instruction.id === RamInstructionId.Halt) {
+            if (instruction.id === RamInstructionId.Halt || this.ramMachine.ip >= this.ramMachine.program.length) {
                 this.initialized = false;
                 return;
             }

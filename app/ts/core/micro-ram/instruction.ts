@@ -1,5 +1,6 @@
 
 export enum InstructionId {
+    Init,
     AssignConst,
     AssignB,
     AssignC,
@@ -25,6 +26,8 @@ export class Instruction {
 
     toString() : string {
         switch(this.id) {
+            case InstructionId.Init:
+                return 'init';
             case InstructionId.AssignConst:
                 return `A = ${this.args[0]}`;
             case InstructionId.AssignB:
