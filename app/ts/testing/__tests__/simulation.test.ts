@@ -1,9 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { SimulationTester } from "../helpers/simulation-tester";
+import { RamSimulator as SimulationTester } from "../../core/micro-ram/ram-simulator";
 import {prepareTestNumbers, selectRandomFraction, shuffleArray} from "../helpers/environment-setup";
 import {Instruction as MicroInstruction, InstructionId as MicroInstructionId} from "../../core/micro-ram/instruction";
-import { arraysEqual } from "../../utils";
+import {arraysEqual, intDiv} from "../../utils";
 import { Faker, cs_CZ } from '@faker-js/faker';
 
 const originalConsoleLog = console.log;
@@ -19,7 +19,7 @@ let simulationTester: SimulationTester;
 
 beforeAll(() => {
     const sets = fs.readFileSync(
-        path.join(__dirname, '../../../assets/turing_sets.txt'),
+        path.join(__dirname, '../../../assets/turing-sets.txt'),
         'utf-8'
     );
     simulationTester = new SimulationTester(sets);
@@ -380,5 +380,63 @@ describe('memory', () => {
         } catch (e) {
             throw new Error(`Simulation failed: ${e}`);
         }
+    });
+});
+
+function testArithmetic(operator: string) {
+    let a = shuffleArray(testNumbers, faker);
+    let b = shuffleArray(testNumbers, faker);
+
+    for (let i = 0; i < testNumbers.length; i++) {
+        let result: number;
+
+        switch (operator) {
+            case "+":
+                result = a[i] + b[i];
+                break;
+            case "-":
+                result = a[i] - b[i];
+                break;
+            case "*":
+                result = a[i] * b[i];
+                break;
+            case "/":
+                result = intDiv(a[i], b[i]);
+                break;
+            default:
+                throw new Error("This operator is not known.");
+        }
+
+        try {
+            simulationTester.initialize([
+                new MicroInstruction(MicroInstructionId.AssignConst, [a[i]]),
+                new MicroInstruction(MicroInstructionId.AssignB),
+                new MicroInstruction(MicroInstructionId.AssignConst, [b[i]]),
+                new MicroInstruction(MicroInstructionId.Arithmetic, [operator]),
+            ], []);
+            simulationTester.executeAll();
+
+            expect(simulationTester.ramMachine.A).toBe(result);
+        } catch (e) {
+            throw new Error(`Simulation failed at input ${a[i]} ${operator} ${b[i]} = ${result}: ${e}`);
+        }
+    }
+}
+
+describe('arithmetic', () => {
+    test('add', () => {
+        //testArithmetic('+');
+    });
+
+    test('sub', () => {
+        //testArithmetic('-');
+    });
+
+    test('mul', () => {
+        //testArithmetic('*');
+    });
+
+    test('div', () => {
+        //testArithmetic('/');
     });
 });

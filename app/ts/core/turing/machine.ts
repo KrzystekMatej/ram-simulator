@@ -2,9 +2,16 @@ import { SparseTape } from '../tape/sparse';
 import { LinearTape } from '../tape/linear';
 import { TapeSymbol } from '../tape/symbol';
 import { Tape } from '../tape/tape';
-import { TapeAction, Instruction } from './instruction';
+import {TapeAction, Instruction, Instruction as TuringInstruction} from './instruction';
 import { TapeId } from './tape-id';
 import { indexOfLeft, indexOfRight, logSeparator, twosComplementToInt } from '../../utils';
+
+export class MachineError extends Error {
+    constructor(message: string) {
+    super(message);
+    this.name = "MachineError";
+    }
+}
 
 export class Machine {
     tapes: Tape<TapeSymbol>[] = [
@@ -17,7 +24,9 @@ export class Machine {
         new LinearTape(TapeSymbol.Blank),
     ];
 
-    state: string = "start";
+    state: string = "halt";
+    program: Map<string, Instruction[]> = new Map();
+    current: Instruction = Instruction.createNop("halt");
 
     getRegisterContents(tapeId: TapeId): number {
         if (tapeId > TapeId.T) throw new Error("The contents of memory cant be described as a list of numbers!");
@@ -66,6 +75,47 @@ export class Machine {
         return memory;
     }
 
+    initialize(initProgram: Map<string, Instruction[]>, startProgram: Map<string, Instruction[]>): void {
+        this.reset();
+        this.state = "start";
+        this.setProgram(initProgram);
+        this.executeProgram();
+        this.setProgram(startProgram);
+    }
+
+    setProgram(program: Map<string, Instruction[]>): void {
+        this.program.clear();
+        program.forEach((value, key) => {
+            this.program.set(key, value);
+        });
+        this.next();
+    }
+
+    executeProgram(): void {
+        if (this.state.includes("halt")) return;
+
+        do {
+            this.execute();
+            this.next();
+        } while (!(this.state.includes("start") || this.state.includes("halt")))
+    }
+
+    next(): Instruction {
+        if (this.state.includes("halt")) return this.current;
+
+        let stateInstructions: TuringInstruction[] = this.program.get(this.state) as TuringInstruction[];
+
+        for (const instruction of stateInstructions) {
+            if (this.isSatisfied(instruction)) {
+                this.current = instruction;
+                this.state = this.current!.target;
+                return instruction;
+            }
+        }
+
+        throw new MachineError("No suitable instruction found!");
+    }
+
     isSatisfied(instruction: Instruction): boolean {
 
         for (let i = 0; i < instruction.conditions.length; i++) {
@@ -85,6 +135,15 @@ export class Machine {
         return true;
     }
 
+    execute(): void {
+        let headReads = this.getHeadReads();
+
+         for (let i = 0; i < this.current!.actions.length; i++) {
+            const action = this.current!.actions[i];
+            this.executeAction(i, action, headReads);
+        }
+    }
+
     executeAction(index: number, action: TapeAction, symbols: TapeSymbol[]): void {
         const tape = this.tapes[index];
 
@@ -102,31 +161,6 @@ export class Machine {
         tape.move(action.move);
     }
 
-    executeTransition(stateInstructions: Instruction[]): void {
-        for (const instruction of stateInstructions) {
-            if (this.isSatisfied(instruction)) {
-                let headReads = this.getHeadReads();
-
-                logSeparator();
-                console.log("State Before");
-                this.logConfiguration();
-                this.logTransition(instruction, headReads);
-
-                for (let i = 0; i < instruction.actions.length; i++) {
-                    const action = instruction.actions[i];
-                    this.executeAction(i, action, headReads);
-                }
-                this.state = instruction.target;
-
-                console.log("State After");
-                this.logConfiguration();
-                logSeparator();
-
-                break;
-            }
-        }
-    }
-
     formatTapeContents(tapeId: TapeId, left: number, right: number): string {
         const tape = this.tapes[tapeId];
         const contents = tape.getSegmentsAroundHead(left, right);
@@ -136,6 +170,18 @@ export class Machine {
         );
 
         return `[${formatted.join(", ")}]`;
+    }
+
+    getHeadReads() {
+        let symbols: TapeSymbol[] = [];
+        this.tapes.forEach((t) => { symbols.push(t.read() ?? TapeSymbol.Blank); });
+        return symbols;
+    }
+
+    reset(): void {
+        this.tapes.forEach(t => t.reset());
+        this.state = "halt";
+        this.program.clear();
     }
 
     logTransition(instruction: Instruction, headReads: TapeSymbol[]): void {
@@ -161,10 +207,8 @@ export class Machine {
         logSeparator();
     }
 
-    getHeadReads() {
-        let symbols: TapeSymbol[] = [];
-        this.tapes.forEach((t) => { symbols.push(t.read() ?? TapeSymbol.Blank); });
-        return symbols;
+    getTransitionString(instruction: Instruction, headReads: TapeSymbol[]): string {
+        return this.getLeft(headReads) + " = " + this.getRight(instruction, headReads);
     }
 
     getLeft(headReads: TapeSymbol[]): string {
@@ -192,14 +236,5 @@ export class Machine {
             return `${name}(${symbolToWrite}, ${actions[i].move})`;
         });
         return `(${instruction.target}, ${acts.join(", ")})`;
-    }
-
-    getTransitionString(instruction: Instruction, headReads: TapeSymbol[]): string {
-        return this.getLeft(headReads) + " = " + this.getRight(instruction, headReads);
-    }
-
-    reset(): void {
-        this.tapes.forEach(t => t.reset());
-        this.state = "start";
     }
 }

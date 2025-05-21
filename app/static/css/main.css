@@ -1,0 +1,32 @@
+.btn-dark-hover {
+    background-color: #212529;
+    color: #fff;
+    transition: background-color 0.2s ease;
+}
+
+.btn-dark-hover:hover {
+    background-color: #343a40; /* o něco světlejší */
+}
+
+.play-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #212529;
+    border: none;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.play-btn:hover {
+    background-color: #343a40;
+}
+
+.play-icon {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid white;
+    margin-left: 2px;
+}

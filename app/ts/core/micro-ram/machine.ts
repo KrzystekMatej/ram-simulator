@@ -1,6 +1,6 @@
-import { Instruction } from './instruction';
-import { LinearTape } from '../tape/linear'
-import { Move } from '../tape/move';
+import {Instruction, InstructionId} from './instruction';
+import {LinearTape} from '../tape/linear'
+import {Move} from '../tape/move';
 
 export class Machine {
     ip: number = 0;
@@ -13,6 +13,9 @@ export class Machine {
 
     input: LinearTape<number | undefined> = new LinearTape(undefined);
     output: LinearTape<number | undefined> = new LinearTape(undefined);
+
+    program: Instruction[] = [];
+    current:  Instruction = new Instruction(InstructionId.Halt);
 
     static readonly handlers: ((this: Machine, ...args: any[]) => void)[] = [
         function assignConst(value: number) {
@@ -88,9 +91,20 @@ export class Machine {
         },
         function halt() {
             console.log(`halt`);
-            this.ip = -2;
         }
     ];
+
+    initialize(program: Instruction[], inputs: number[]) : void {
+        this.reset();
+        this.setProgram(program);
+        this.initInputs(inputs);
+        this.current = this.program[this.ip];
+    }
+
+    setProgram(program: Instruction[]) : void {
+        this.program.length = 0;
+        this.program.push(...program);
+    }
 
     initInputs(inputs: number[]) : void {
         inputs.forEach((value) => {
@@ -100,10 +114,22 @@ export class Machine {
         this.input.seek(0);
     }
 
-    execute(instruction: Instruction): void {
-        Machine.handlers[instruction.id].call(this, ...instruction.args);
+    executeProgram() {
+        while (this.current.id === InstructionId.Halt) {
+            this.execute();
+            this.next();
+        }
+    }
+
+    next() : Instruction {
+        if (this.current.id === InstructionId.Halt) return this.current;
         this.ip++;
-        this.logState();
+        this.current = this.program[this.ip];
+        return this.current;
+    }
+
+    execute(): void {
+        Machine.handlers[this.current.id].call(this, ...this.current.args);
     }
 
     logState(): void {
@@ -122,5 +148,6 @@ export class Machine {
         this.memory.clear();
         this.input.reset();
         this.output.reset();
+        this.program.length = 0;
     }
 }

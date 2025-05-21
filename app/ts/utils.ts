@@ -80,3 +80,7 @@ export function mapsEqual<K, V>(a: Map<K, V>, b: Map<K, V>, valueEqual: (x: V, y
 
     return true;
 }
+
+export function intDiv(a: number, b: number): number {
+    return a / b >= 0 ? Math.floor(a / b) : Math.ceil(a / b);
+}
