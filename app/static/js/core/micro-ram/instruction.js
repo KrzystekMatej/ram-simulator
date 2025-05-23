@@ -1,17 +1,18 @@
 export var InstructionId;
 (function (InstructionId) {
-    InstructionId[InstructionId["AssignConst"] = 0] = "AssignConst";
-    InstructionId[InstructionId["AssignB"] = 1] = "AssignB";
-    InstructionId[InstructionId["AssignC"] = 2] = "AssignC";
-    InstructionId[InstructionId["Load"] = 3] = "Load";
-    InstructionId[InstructionId["Store"] = 4] = "Store";
-    InstructionId[InstructionId["Arithmetic"] = 5] = "Arithmetic";
-    InstructionId[InstructionId["Jump"] = 6] = "Jump";
-    InstructionId[InstructionId["CondJump"] = 7] = "CondJump";
-    InstructionId[InstructionId["Read"] = 8] = "Read";
-    InstructionId[InstructionId["Write"] = 9] = "Write";
-    InstructionId[InstructionId["Halt"] = 10] = "Halt";
-    InstructionId[InstructionId["Count"] = 11] = "Count";
+    InstructionId[InstructionId["Init"] = 0] = "Init";
+    InstructionId[InstructionId["AssignConst"] = 1] = "AssignConst";
+    InstructionId[InstructionId["AssignB"] = 2] = "AssignB";
+    InstructionId[InstructionId["AssignC"] = 3] = "AssignC";
+    InstructionId[InstructionId["Load"] = 4] = "Load";
+    InstructionId[InstructionId["Store"] = 5] = "Store";
+    InstructionId[InstructionId["Arithmetic"] = 6] = "Arithmetic";
+    InstructionId[InstructionId["Jump"] = 7] = "Jump";
+    InstructionId[InstructionId["CondJump"] = 8] = "CondJump";
+    InstructionId[InstructionId["Read"] = 9] = "Read";
+    InstructionId[InstructionId["Write"] = 10] = "Write";
+    InstructionId[InstructionId["Halt"] = 11] = "Halt";
+    InstructionId[InstructionId["Count"] = 12] = "Count";
 })(InstructionId || (InstructionId = {}));
 export class Instruction {
     constructor(id, args = []) {
@@ -20,6 +21,8 @@ export class Instruction {
     }
     toString() {
         switch (this.id) {
+            case InstructionId.Init:
+                return 'init';
             case InstructionId.AssignConst:
                 return `A = ${this.args[0]}`;
             case InstructionId.AssignB:
@@ -43,7 +46,7 @@ export class Instruction {
             case InstructionId.Halt:
                 return "halt";
             default:
-                throw Error("This micro instruction does not exist.");
+                throw Error(`Micro instruction with invalid id - ${this.id}.`);
         }
     }
 }

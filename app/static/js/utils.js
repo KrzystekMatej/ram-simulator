@@ -39,6 +39,9 @@ export function indexOfLeft(arr, val, pos) {
 export function IntToMinimalTwosComplement(value) {
     if (value === 0)
         return '0';
+    if (!Number.isSafeInteger(value)) {
+        throw new Error(`Conversion error: ${value} is not a safe integer`);
+    }
     if (value > 0) {
         return '0' + value.toString(2);
     }
@@ -48,20 +51,30 @@ export function IntToMinimalTwosComplement(value) {
         if (foundOne) {
             absBinary[i] = absBinary[i] === '0' ? '1' : '0';
         }
-        else if (absBinary[i] === '1') {
+        else if (absBinary[i] === '1' && i !== 0) {
             foundOne = true;
         }
     }
-    absBinary.unshift('1');
+    if (foundOne)
+        absBinary.unshift('1');
     return absBinary.join('');
 }
 export function twosComplementToInt(bin) {
-    const bits = bin.length;
-    const value = parseInt(bin, 2);
-    if (bin[0] === '1') {
-        return value - (1 << bits);
+    const bits = BigInt(bin.length);
+    let value = 0n;
+    for (let i = 0; i < bin.length; i++) {
+        if (bin[i] === '1') {
+            value += 1n << BigInt(bin.length - i - 1);
+        }
     }
-    return value;
+    if (bin[0] === '1') {
+        value -= 1n << bits;
+    }
+    const result = Number(value);
+    if (!Number.isSafeInteger(result)) {
+        throw new Error(`Parsing error: ${bin}`);
+    }
+    return result;
 }
 export function mapsEqual(a, b, valueEqual = (x, y) => x === y) {
     if (a.size !== b.size)
@@ -74,4 +87,66 @@ export function mapsEqual(a, b, valueEqual = (x, y) => x === y) {
             return false;
     }
     return true;
+}
+export function intDiv(a, b) {
+    return a / b >= 0 ? Math.floor(a / b) : Math.ceil(a / b);
+}
+export function safeParseInteger(str) {
+    const n = Number(str);
+    if (Number.isSafeInteger(n)) {
+        throw new Error(`Parsing error: ${str}`);
+    }
+    return n;
+}
+export function safeNumberOperation(operation, ...args) {
+    const result = operation(...args);
+    return Number.isSafeInteger(result) ? result : undefined;
+}
+export function safeAdd(a, b) {
+    const result = safeNumberOperation((x, y) => x + y, a, b);
+    if (result === undefined) {
+        throw new Error(`Integer overflow: ${a} + ${b}`);
+    }
+    return result;
+}
+export function safeSub(a, b) {
+    const result = safeNumberOperation((x, y) => x - y, a, b);
+    if (result === undefined) {
+        throw new Error(`Integer overflow: ${a} - ${b}`);
+    }
+    return result;
+}
+export function safeMul(a, b) {
+    const result = safeNumberOperation((x, y) => x * y, a, b);
+    if (result === undefined) {
+        throw new Error(`Integer overflow: ${a} * ${b}`);
+    }
+    return result;
+}
+export function safeIntDiv(a, b) {
+    if (b === 0)
+        throw new Error(`Division by zero: ${a} / ${b}`);
+    const result = safeNumberOperation((x, y) => intDiv(x, y), a, b);
+    if (result === undefined) {
+        throw new Error(`Integer overflow: ${a} / ${b}`);
+    }
+    return result;
+}
+export function prefixFunctionErrors(prefix, fn, ...args) {
+    try {
+        return fn(...args);
+    }
+    catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new Error(`${prefix}${message}`);
+    }
+}
+export function prefixMethodErrors(prefix, method, thisArg, ...args) {
+    try {
+        return method.apply(thisArg, args);
+    }
+    catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        throw new Error(`${prefix}${msg}`);
+    }
 }

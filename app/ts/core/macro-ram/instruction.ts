@@ -1,5 +1,6 @@
 
 export enum InstructionId {
+    Init,
     AssignConst,
     AssignRegister,
     Load,

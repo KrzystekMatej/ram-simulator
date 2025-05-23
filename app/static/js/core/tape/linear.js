@@ -25,7 +25,7 @@ export class LinearTape extends Tape {
         return this.tape[tapePosition];
     }
     getFullContents(padding) {
-        return [this.head, this.getSegments(0, padding, this.tape.length - 1 + padding)];
+        return [this.zeroOffset + this.head, this.getSegments(0, this.zeroOffset + padding, this.tape.length - this.zeroOffset - 1 + padding)];
     }
     reset() {
         super.reset();

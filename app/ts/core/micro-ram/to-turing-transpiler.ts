@@ -36,11 +36,7 @@ export class ToTuringTranspiler {
                     }
                     currentMap.get(source)!.push(instruction);
                 } catch (error) {
-                    let message = 'Unknown error';
-                    if (error instanceof Error) {
-                        message = error.message;
-                    }
-                    throw new Error(`Error at line ${i + 1}: "${rawLine}"\n${message}`);
+                    throw new Error(`Error at line ${i + 1}: "${rawLine}"\n${String(error)}`);
                 }
             } else {
                 throw new Error(`Unexpected line outside of instruction block at line ${i + 1}: "${rawLine}"`);
@@ -89,7 +85,6 @@ export class ToTuringTranspiler {
             return this.getInitializationSet(inputs);
         },
         function assignConst(constant: number) {
-            console.log('transpile: assignConst');
             let turingSet: Map<string, TuringInstruction[]> = new Map();
 
             const twosComplement: string = IntToMinimalTwosComplement(constant);
@@ -115,23 +110,18 @@ export class ToTuringTranspiler {
             return turingSet;
         },
         function assignB() {
-            console.log('transpile: assign B');
             return this.getTuringSet('assign_b');
         },
         function assignC() {
-            console.log('transpile: assign C');
             return this.getTuringSet('assign_c');
         },
         function load() {
-            console.log('transpile: load');
             return this.getTuringSet('load');
         },
         function store() {
-            console.log('transpile: store');
             return this.getTuringSet('store');
         },
         function arithmetic(op: string) {
-            console.log('transpile: arithmetic');
             switch (op) {
                 case '+':
                     return this.getTuringSet('add');
@@ -146,7 +136,6 @@ export class ToTuringTranspiler {
             }
         },
         function jump(label: number) {
-            console.log('transpile: jump');
             let turingSet: Map<string, TuringInstruction[]> = this.getTuringSet('jmp');
             ToTuringTranspiler.specifyGotoLabel(turingSet, label);
             return turingSet;
@@ -156,32 +145,26 @@ export class ToTuringTranspiler {
 
             switch (rel) {
                 case '==':
-                    console.log('transpile: je');
                     turingSet = this.getTuringSet('je');
                     ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                     return turingSet;
                 case '!=':
-                    console.log('transpile: jne');
                     turingSet = this.getTuringSet('jne');
                     ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                     return turingSet;
                 case '<=':
-                    console.log('transpile: jle');
                     turingSet = this.getTuringSet('jle');
                     ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                     return turingSet;
                 case '>=':
-                    console.log('transpile: jge');
                     turingSet = this.getTuringSet('jge');
                     ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                     return turingSet;
                 case '<':
-                    console.log('transpile: jl');
                     turingSet = this.getTuringSet('jl');
                     ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                     return turingSet;
                 case '>':
-                    console.log('transpile: jg');
                     turingSet = this.getTuringSet('jg');
                     ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                     return turingSet;
@@ -190,21 +173,17 @@ export class ToTuringTranspiler {
             }
         },
         function read() {
-            console.log('transpile: read');
             return this.getTuringSet('read');
         },
         function write() {
-            console.log('transpile: write');
             return this.getTuringSet('write');
         },
         function halt() {
-            console.log('transpile: halt');
             return this.getTuringSet('halt');
         }
     ];
 
     getInitializationSet(inputs: number[]): Map<string, TuringInstruction[]> {
-        console.log('transpile: initialize');
         let turingSet: Map<string, TuringInstruction[]> = this.getTuringSet('init');
 
         if (inputs.length <= 0)

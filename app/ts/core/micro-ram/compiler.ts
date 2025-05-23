@@ -1,15 +1,23 @@
+import { prefixMethodErrors, safeParseInteger } from '../../utils';
 import { Instruction, InstructionId} from './instruction';
 
 export class Compiler {
 
     compile(text: string): Instruction[] {
         let instructions: Instruction[] = [];
+        const lines = text.split('\n');
 
-        for (const line of text.split('\n')) {
-            const trimmed = line.trim();
+        for (let i = 0; i < lines.length; i++) {
+            const trimmed = lines[i].trim();
             if (trimmed.length === 0 || trimmed.startsWith('//')) continue;
-            instructions.push(this.parseInstruction(trimmed));
+            const instruction = prefixMethodErrors(`Error at line ${i}: ${lines[i]}`, this.parseInstruction, this, trimmed);
+            instructions.push(instruction);
         }
+
+        if (instructions[0].id !== InstructionId.Init) throw new Error('Missing init instruction at the start');
+
+        const initCount = instructions.filter(x => x.id === InstructionId.Init).length;
+        if (initCount > 1) throw new Error('Multiple init instructions');
 
         return instructions;
     }
@@ -29,19 +37,12 @@ export class Compiler {
                 }
 
                 const parts = contents.split(',').map(s => s.trim());
-                const numbers = parts.map(s => {
-                    const n = Number(s);
-                    if (!Number.isInteger(n)) {
-                        throw new Error(`Invalid number in init list: '${s}'`);
-                    }
-                    return n;
-                });
-
-                return new Instruction(InstructionId.Init, numbers);
+                const inputs = parts.map(s => safeParseInteger(s));
+                return new Instruction(InstructionId.Init, inputs);
             }
             case /^A\s*=\s*\d+$/.test(line): {
                 const match = line.match(/^A\s*=\s*(\d+)$/);
-                return new Instruction(InstructionId.AssignConst, [parseInt(match![1])]);
+                return new Instruction(InstructionId.AssignConst, [safeParseInteger(match![1])]);
             }
             case /^B\s*=\s*A$/.test(line):
                 return new Instruction(InstructionId.AssignB);
@@ -57,11 +58,11 @@ export class Compiler {
             }
             case /^goto\s+\d+$/.test(line): {
                 const match = line.match(/^goto\s+(\d+)$/);
-                return new Instruction(InstructionId.Jump, [parseInt(match![1])]);
+                return new Instruction(InstructionId.Jump, [safeParseInteger(match![1])]);
             }
             case /^if\s*\(\s*A\s*(==|!=|<=|>=|<|>)\s*0\s*\)\s*goto\s*\d+$/.test(line): {
                 const match = line.match(/^if\s*\(\s*A\s*(==|!=|<=|>=|<|>)\s*0\s*\)\s*goto\s*(\d+)$/);
-                return new Instruction(InstructionId.CondJump, [match![1], parseInt(match![2])]);
+                return new Instruction(InstructionId.CondJump, [match![1], safeParseInteger(match![2])]);
             }
             case /^A\s*=\s*READ\(\)$/.test(line):
                 return new Instruction(InstructionId.Read);
@@ -71,6 +72,6 @@ export class Compiler {
                 return new Instruction(InstructionId.Halt);
         }
 
-        throw new Error(`Unknown instruction: ${line}`);
+        throw new Error("Unknown instruction");
     }
 }

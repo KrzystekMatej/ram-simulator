@@ -31,7 +31,7 @@ export class LinearTape<T> extends Tape<T> {
     }
 
     override getFullContents(padding: number): [number, T[]] {
-        return [this.head, this.getSegments(0, padding, this.tape.length - 1 + padding)];
+        return [this.zeroOffset + this.head, this.getSegments(0, this.zeroOffset + padding, this.tape.length - this.zeroOffset - 1 + padding)];
     }
 
     override reset(): void {

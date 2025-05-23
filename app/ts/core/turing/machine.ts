@@ -2,24 +2,17 @@ import { SparseTape } from '../tape/sparse';
 import { LinearTape } from '../tape/linear';
 import { TapeSymbol } from '../tape/symbol';
 import { Tape } from '../tape/tape';
-import {TapeAction, Instruction, Instruction as TuringInstruction} from './instruction';
+import { TapeAction, Instruction, Instruction as TuringInstruction } from './instruction';
 import { TapeId } from './tape-id';
 import { indexOfLeft, indexOfRight, logSeparator, twosComplementToInt } from '../../utils';
 
-export class MachineError extends Error {
-    constructor(message: string) {
-    super(message);
-    this.name = "MachineError";
-    }
-}
-
 export class Machine {
     tapes: Tape<TapeSymbol>[] = [
-        new SparseTape(TapeSymbol.Blank),
-        new SparseTape(TapeSymbol.Blank),
-        new SparseTape(TapeSymbol.Blank),
-        new SparseTape(TapeSymbol.Blank),
-        new SparseTape(TapeSymbol.Blank),
+        new LinearTape(TapeSymbol.Blank),
+        new LinearTape(TapeSymbol.Blank),
+        new LinearTape(TapeSymbol.Blank),
+        new LinearTape(TapeSymbol.Blank),
+        new LinearTape(TapeSymbol.Blank),
         new LinearTape(TapeSymbol.Blank),
         new LinearTape(TapeSymbol.Blank),
     ];
@@ -29,21 +22,34 @@ export class Machine {
     current: Instruction = Instruction.createNop("halt");
 
     getRegisterContents(tapeId: TapeId): number {
-        if (tapeId > TapeId.T) throw new Error("The contents of memory cant be described as a list of numbers!");
+        if (tapeId > TapeId.T) throw new Error(`The contents of tape ${tapeId} can't be described as a number!`);
         const [head, symbols] = this.tapes[tapeId].getFullContents(0);
 
         const left = indexOfLeft(symbols, TapeSymbol.End, head);
         const right = indexOfRight(symbols, TapeSymbol.End, head);
 
+        if (left === -1 || right === -1) return 0;
+
         return twosComplementToInt(symbols.slice(left + 1, right).join(""));
     }
 
     getIOTapeContents(tapeId: TapeId): number[] {
-        if (tapeId !== TapeId.I && tapeId !== TapeId.O) throw new Error("The contents of memory cant be described as a list of numbers!");
+        if (tapeId !== TapeId.I && tapeId !== TapeId.O) throw new Error(`The contents of tape ${tapeId} can't be described as a list of numbers!`);
         const [_, symbols] = this.tapes[tapeId].getFullContents(0);
-        const endIndex = symbols.lastIndexOf(TapeSymbol.Separator);
+        const leftZero = symbols.indexOf(TapeSymbol.Zero);
+        const leftOne = symbols.indexOf(TapeSymbol.One);
+        let left: number;
 
-        const rawNumbers = symbols.slice(0, endIndex).join("").split(TapeSymbol.Separator);
+        if (leftZero === -1) left = leftOne;
+        else if (leftOne === -1) left = leftZero;
+        else if (leftZero !== -1 && leftOne !== -1) left = Math.min(leftZero, leftOne);
+        else return [];
+
+        const right = symbols.lastIndexOf(TapeSymbol.Separator);
+
+        if (right === -1) return [];
+
+        const rawNumbers = symbols.slice(left, right).join("").split(TapeSymbol.Separator);
         let numbers: number[] = [];
 
         for (const raw of rawNumbers) {
@@ -59,6 +65,8 @@ export class Machine {
 
         const left = indexOfLeft(symbols, TapeSymbol.End, head);
         const right = indexOfRight(symbols, TapeSymbol.End, head);
+
+        if (left === -1 || right === -1) return new Map();
 
         const rawMemory = symbols.slice(left + 1, right).join("");
 
@@ -103,6 +111,7 @@ export class Machine {
         if (this.state.includes("halt")) return this.current;
 
         this.state = this.current.target;
+        if (this.state.includes("error")) throw new Error(`Transitioning to error state: ${this.state}`);
         this.current = this.getSatisfied();
         return this.current;
     }
@@ -116,7 +125,7 @@ export class Machine {
             }
         }
 
-        throw new MachineError("No suitable instruction found!");
+        throw new Error(`No suitable instruction found for ${this.getLeft(this.getHeadReads())}!`);
     }
 
     isSatisfied(instruction: Instruction): boolean {
@@ -141,7 +150,7 @@ export class Machine {
     execute(): void {
         let headReads = this.getHeadReads();
 
-         for (let i = 0; i < this.current.actions.length; i++) {
+        for (let i = 0; i < this.current.actions.length; i++) {
             const action = this.current.actions[i];
             this.executeAction(i, action, headReads);
         }

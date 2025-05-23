@@ -1,18 +1,19 @@
 export var InstructionId;
 (function (InstructionId) {
-    InstructionId[InstructionId["AssignConst"] = 0] = "AssignConst";
-    InstructionId[InstructionId["AssignRegister"] = 1] = "AssignRegister";
-    InstructionId[InstructionId["Load"] = 2] = "Load";
-    InstructionId[InstructionId["Store"] = 3] = "Store";
-    InstructionId[InstructionId["ArithmeticRegister"] = 4] = "ArithmeticRegister";
-    InstructionId[InstructionId["ArithmeticConstant"] = 5] = "ArithmeticConstant";
-    InstructionId[InstructionId["Jump"] = 6] = "Jump";
-    InstructionId[InstructionId["CondJumpRegister"] = 7] = "CondJumpRegister";
-    InstructionId[InstructionId["CondJumpConstant"] = 8] = "CondJumpConstant";
-    InstructionId[InstructionId["Read"] = 9] = "Read";
-    InstructionId[InstructionId["Write"] = 10] = "Write";
-    InstructionId[InstructionId["Halt"] = 11] = "Halt";
-    InstructionId[InstructionId["Count"] = 12] = "Count";
+    InstructionId[InstructionId["Init"] = 0] = "Init";
+    InstructionId[InstructionId["AssignConst"] = 1] = "AssignConst";
+    InstructionId[InstructionId["AssignRegister"] = 2] = "AssignRegister";
+    InstructionId[InstructionId["Load"] = 3] = "Load";
+    InstructionId[InstructionId["Store"] = 4] = "Store";
+    InstructionId[InstructionId["ArithmeticRegister"] = 5] = "ArithmeticRegister";
+    InstructionId[InstructionId["ArithmeticConstant"] = 6] = "ArithmeticConstant";
+    InstructionId[InstructionId["Jump"] = 7] = "Jump";
+    InstructionId[InstructionId["CondJumpRegister"] = 8] = "CondJumpRegister";
+    InstructionId[InstructionId["CondJumpConstant"] = 9] = "CondJumpConstant";
+    InstructionId[InstructionId["Read"] = 10] = "Read";
+    InstructionId[InstructionId["Write"] = 11] = "Write";
+    InstructionId[InstructionId["Halt"] = 12] = "Halt";
+    InstructionId[InstructionId["Count"] = 13] = "Count";
 })(InstructionId || (InstructionId = {}));
 export class Instruction {
     constructor(id, args = []) {

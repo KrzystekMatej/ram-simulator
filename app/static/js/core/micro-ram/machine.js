@@ -1,5 +1,7 @@
+import { Instruction, InstructionId } from './instruction';
 import { LinearTape } from '../tape/linear';
 import { Move } from '../tape/move';
+import { prefixFunctionErrors, safeAdd, safeIntDiv, safeMul, safeSub } from "../../utils";
 export class Machine {
     constructor() {
         this.ip = 0;
@@ -9,18 +11,33 @@ export class Machine {
         this.memory = new Map();
         this.input = new LinearTape(undefined);
         this.output = new LinearTape(undefined);
+        this.program = [];
+        this.current = new Instruction(InstructionId.Halt);
     }
-    initInputs(inputs) {
-        inputs.forEach((value) => {
-            this.input.write(value);
-            this.input.move(Move.Right);
-        });
-        this.input.seek(0);
+    initialize(program) {
+        this.reset();
+        this.setProgram(program);
+        this.current = this.program[this.ip];
     }
-    execute(instruction) {
-        Machine.handlers[instruction.id].call(this, ...instruction.args);
+    setProgram(program) {
+        this.program.length = 0;
+        this.program.push(...program);
+    }
+    executeProgram() {
+        while (this.current.id === InstructionId.Halt) {
+            this.execute();
+            this.next();
+        }
+    }
+    next() {
+        if (this.current.id === InstructionId.Halt && this.ip >= this.program.length)
+            return this.current;
         this.ip++;
-        this.logState();
+        this.current = this.program[this.ip];
+        return this.current;
+    }
+    execute() {
+        prefixFunctionErrors(`Execution error at line ${this.ip}: ${this.current.toString()}`, () => Machine.handlers[this.current.id].call(this, ...this.current.args));
     }
     logState() {
         console.log(`[IP: ${this.ip}]`);
@@ -37,19 +54,25 @@ export class Machine {
         this.memory.clear();
         this.input.reset();
         this.output.reset();
+        this.program.length = 0;
+        this.current = new Instruction(InstructionId.Halt);
     }
 }
 Machine.handlers = [
+    function init(...inputs) {
+        inputs.forEach((value) => {
+            this.input.write(value);
+            this.input.move(Move.Right);
+        });
+        this.input.seek(0);
+    },
     function assignConst(value) {
-        console.log(`A = ${value}`);
         this.A = value;
     },
     function assignB() {
-        console.log(`B = A (${this.A})`);
         this.B = this.A;
     },
     function assignC() {
-        console.log(`C = A (${this.A})`);
         this.C = this.A;
     },
     function load() {
@@ -62,34 +85,30 @@ Machine.handlers = [
             this.memory.set(this.A, val);
         }
         this.A = val;
-        console.log(`A = [${this.A}] = ${val}`);
     },
     function store() {
-        console.log(`[${this.C}] = A (${this.A})`);
         this.memory.set(this.C, this.A);
     },
     function arithmetic(op) {
         let result;
         switch (op) {
             case '+':
-                result = this.A + this.B;
+                result = safeAdd(this.A, this.B);
                 break;
             case '-':
-                result = this.A - this.B;
+                result = safeSub(this.A, this.B);
                 break;
             case '*':
-                result = this.A * this.B;
+                result = safeMul(this.A, this.B);
                 break;
             case '/':
-                result = this.B === 0 ? 0 : Math.trunc(this.A / this.B);
+                result = safeIntDiv(this.A, this.B);
                 break;
-            default: throw new Error(`Unknown op ${op}`);
+            default: throw new Error(`Unknown operator ${op}`);
         }
-        console.log(`A = A ${op} B → ${result}`);
         this.A = result;
     },
     function jump(label) {
-        console.log(`goto ${label}`);
         this.ip = label - 1;
     },
     function conditionalJump(rel, label) {
@@ -116,23 +135,19 @@ Machine.handlers = [
                 break;
             default: throw new Error(`Unknown relation ${rel}`);
         }
-        console.log(`if (A ${rel} 0) → ${cond} → ${cond ? `goto ${label}` : 'no jump'}`);
         if (cond)
             this.ip = label - 1;
     },
     function read() {
         const value = this.input.read();
+        if (value === undefined)
+            throw new Error("Missing input");
         this.input.move(Move.Right);
-        console.log(`A = READ() → ${value}`);
         this.A = value;
     },
     function write() {
-        console.log(`WRITE(A) → ${this.A}`);
         this.output.write(this.A);
         this.output.move(Move.Right);
     },
-    function halt() {
-        console.log(`halt`);
-        this.ip = -2;
-    }
+    function halt() { }
 ];

@@ -33,11 +33,7 @@ export class ToTuringTranspiler {
                     currentMap.get(source).push(instruction);
                 }
                 catch (error) {
-                    let message = 'Unknown error';
-                    if (error instanceof Error) {
-                        message = error.message;
-                    }
-                    throw new Error(`Error at line ${i + 1}: "${rawLine}"\n${message}`);
+                    throw new Error(`Error at line ${i + 1}: "${rawLine}"\n${String(error)}`);
                 }
             }
             else {
@@ -72,10 +68,9 @@ export class ToTuringTranspiler {
         }
     }
     getInitializationSet(inputs) {
-        console.log('transpile: initialize');
         let turingSet = this.getTuringSet('init');
         if (inputs.length <= 0) {
-            turingSet.set('input', [TuringInstruction.createNop('0_start')]);
+            turingSet.set('input', [TuringInstruction.createNop('next')]);
             return turingSet;
         }
         turingSet.set('input', [TuringInstruction.createNop('input_0_0')]);
@@ -95,7 +90,7 @@ export class ToTuringTranspiler {
         });
         turingSet.set('left_shift', [
             TuringInstruction.createFromOrderedEntries('left_shift', [cond(TapeId.I, TapeSymbol.Zero, TapeSymbol.One, TapeSymbol.Separator)], [tapeAct(TapeId.I, TapeId.I, Move.Left)]),
-            TuringInstruction.createFromOrderedEntries('0_start', [cond(TapeId.I, TapeSymbol.Blank)], [tapeAct(TapeId.I, TapeId.I, Move.Right)])
+            TuringInstruction.createFromOrderedEntries('next', [cond(TapeId.I, TapeSymbol.Blank)], [tapeAct(TapeId.I, TapeId.I, Move.Right)])
         ]);
         return turingSet;
     }
@@ -134,8 +129,10 @@ export class ToTuringTranspiler {
     }
 }
 ToTuringTranspiler.handlers = [
+    function init(...inputs) {
+        return this.getInitializationSet(inputs);
+    },
     function assignConst(constant) {
-        console.log('transpile: assignConst');
         let turingSet = new Map();
         const twosComplement = IntToMinimalTwosComplement(constant);
         turingSet.set('start', [TuringInstruction.createNop('left_shift_a')]);
@@ -151,23 +148,18 @@ ToTuringTranspiler.handlers = [
         return turingSet;
     },
     function assignB() {
-        console.log('transpile: assign B');
         return this.getTuringSet('assign_b');
     },
     function assignC() {
-        console.log('transpile: assign C');
         return this.getTuringSet('assign_c');
     },
     function load() {
-        console.log('transpile: load');
         return this.getTuringSet('load');
     },
     function store() {
-        console.log('transpile: store');
         return this.getTuringSet('store');
     },
     function arithmetic(op) {
-        console.log('transpile: arithmetic');
         switch (op) {
             case '+':
                 return this.getTuringSet('add');
@@ -182,7 +174,6 @@ ToTuringTranspiler.handlers = [
         }
     },
     function jump(label) {
-        console.log('transpile: jump');
         let turingSet = this.getTuringSet('jmp');
         ToTuringTranspiler.specifyGotoLabel(turingSet, label);
         return turingSet;
@@ -191,32 +182,26 @@ ToTuringTranspiler.handlers = [
         let turingSet;
         switch (rel) {
             case '==':
-                console.log('transpile: je');
                 turingSet = this.getTuringSet('je');
                 ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                 return turingSet;
             case '!=':
-                console.log('transpile: jne');
                 turingSet = this.getTuringSet('jne');
                 ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                 return turingSet;
             case '<=':
-                console.log('transpile: jle');
                 turingSet = this.getTuringSet('jle');
                 ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                 return turingSet;
             case '>=':
-                console.log('transpile: jge');
                 turingSet = this.getTuringSet('jge');
                 ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                 return turingSet;
             case '<':
-                console.log('transpile: jl');
                 turingSet = this.getTuringSet('jl');
                 ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                 return turingSet;
             case '>':
-                console.log('transpile: jg');
                 turingSet = this.getTuringSet('jg');
                 ToTuringTranspiler.specifyGotoLabel(turingSet, label);
                 return turingSet;
@@ -225,15 +210,12 @@ ToTuringTranspiler.handlers = [
         }
     },
     function read() {
-        console.log('transpile: read');
         return this.getTuringSet('read');
     },
     function write() {
-        console.log('transpile: write');
         return this.getTuringSet('write');
     },
     function halt() {
-        console.log('transpile: halt');
         return this.getTuringSet('halt');
     }
 ];

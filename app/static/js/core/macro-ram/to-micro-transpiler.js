@@ -1,4 +1,4 @@
-import { Instruction as MicroInstruction, InstructionId as MicroInstructionId } from '../micro-ram/instruction';
+import { Instruction as MicroInstruction, InstructionId, InstructionId as MicroInstructionId } from '../micro-ram/instruction';
 export class ToMicroTranspiler {
     transpile(ramInstructions) {
         let microInstructions = [];
@@ -18,8 +18,10 @@ export class ToMicroTranspiler {
     }
 }
 ToMicroTranspiler.handlers = [
+    function init(...inputs) {
+        return [new MicroInstruction(InstructionId.Init, inputs)];
+    },
     function assignConst(register, constant) {
-        console.log('transpile: assign constant');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [register]),
             new MicroInstruction(MicroInstructionId.AssignC),
@@ -29,7 +31,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function AssignRegister(target, source) {
-        console.log('transpile: assign register');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [target]),
             new MicroInstruction(MicroInstructionId.AssignC),
@@ -40,7 +41,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function load(register1, register2) {
-        console.log('transpile: load');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [register1]),
             new MicroInstruction(MicroInstructionId.AssignC),
@@ -52,7 +52,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function store(register1, register2) {
-        console.log('transpile: store');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [register1]),
             new MicroInstruction(MicroInstructionId.Load),
@@ -64,7 +63,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function ArithmeticRegister(target, operand1, operator, operand2) {
-        console.log('transpile: arithmetic register');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [target]),
             new MicroInstruction(MicroInstructionId.AssignC),
@@ -79,7 +77,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function ArithmeticConstant(target, operand1, operator, operand2) {
-        console.log('transpile: arithmetic constant');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [target]),
             new MicroInstruction(MicroInstructionId.AssignC),
@@ -93,14 +90,12 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function jump(label) {
-        console.log('transpile: jump');
         const instructions = [
             new MicroInstruction(MicroInstructionId.Jump, [label]),
         ];
         return instructions;
     },
     function condJumpRegister(operand1, rel, operand2, label) {
-        console.log('transpile: conditional jump');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [operand2]),
             new MicroInstruction(MicroInstructionId.Load),
@@ -113,7 +108,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function condJumpConstant(operand1, rel, operand2, label) {
-        console.log('transpile: conditional jump');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [operand2]),
             new MicroInstruction(MicroInstructionId.AssignB),
@@ -125,7 +119,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function read(target) {
-        console.log('transpile: read');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [target]),
             new MicroInstruction(MicroInstructionId.AssignC),
@@ -135,7 +128,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function write(source) {
-        console.log('transpile: write');
         const instructions = [
             new MicroInstruction(MicroInstructionId.AssignConst, [source]),
             new MicroInstruction(MicroInstructionId.Load),
@@ -144,7 +136,6 @@ ToMicroTranspiler.handlers = [
         return instructions;
     },
     function halt() {
-        console.log('transpile: halt');
         const instructions = [
             new MicroInstruction(MicroInstructionId.Halt)
         ];

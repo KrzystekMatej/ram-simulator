@@ -51,7 +51,7 @@ export class Instruction {
             case InstructionId.Halt:
                 return "halt";
             default:
-                throw Error("This micro instruction does not exist.")
+                throw Error(`Micro instruction with invalid id - ${this.id}.`)
         }
     }
 }

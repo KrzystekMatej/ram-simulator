@@ -1,10 +1,15 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import {RamSimulator as SimulationTester} from "../../core/micro-ram/ram-simulator";
-import {prepareTestNumbers, selectRandomFraction, shuffleArray} from "../helpers/environment-setup";
+import {
+    generatePairsWithRepetition,
+    prepareTestNumbers,
+    selectRandomFraction,
+    shuffleArray,
+    testArithmetic
+} from "../helpers";
 import {
     Instruction as MicroInstruction,
-    InstructionId,
     InstructionId as MicroInstructionId
 } from "../../core/micro-ram/instruction";
 import {arraysEqual, intDiv} from "../../utils";
@@ -20,7 +25,7 @@ const faker = new Faker({
 
 const testNumbers = prepareTestNumbers();
 let simulationTester: SimulationTester;
-const halt = new  MicroInstruction(InstructionId.Halt);
+const halt = new  MicroInstruction(MicroInstructionId.Halt);
 
 beforeAll(() => {
     const sets = fs.readFileSync(
@@ -35,8 +40,8 @@ afterAll(() => {
 });
 
 test('init', () => {
-    simulationTester.initialize([new MicroInstruction(InstructionId.Init, testNumbers), halt]);
-    simulationTester.executeAll();
+    simulationTester.initialize([new MicroInstruction(MicroInstructionId.Init, testNumbers), halt]);
+    simulationTester.executeAllRam();
     expect(simulationTester.ramMachine.A).toBe(0);
     expect(simulationTester.ramMachine.B).toBe(0);
     expect(simulationTester.ramMachine.C).toBe(0);
@@ -50,11 +55,11 @@ describe('assignment', () => {
         for (const number of testNumbers){
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 expect(simulationTester.ramMachine.A).toBe(number);
             } catch (e) {
                 throw new Error(`Simulation failed at input ${number}: ${e}`);
@@ -66,12 +71,12 @@ describe('assignment', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     new MicroInstruction(MicroInstructionId.AssignB),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 expect(simulationTester.ramMachine.B).toBe(number);
             } catch (e) {
                 throw new Error(`Simulation failed at input ${number}: ${e}`);
@@ -83,12 +88,12 @@ describe('assignment', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     new MicroInstruction(MicroInstructionId.AssignC),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 expect(simulationTester.ramMachine.C).toBe(number);
             } catch (e) {
                 throw new Error(`Simulation failed at input ${number}: ${e}`);
@@ -102,28 +107,36 @@ describe('io', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init, [number]),
+                    new MicroInstruction(MicroInstructionId.Init, [number]),
                     new MicroInstruction(MicroInstructionId.Read),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 expect(simulationTester.ramMachine.A).toBe(number);
             } catch (e) {
                 throw new Error(`Simulation failed at input ${number}: ${e}`);
             }
         }
+
+        simulationTester.initialize([
+            new MicroInstruction(MicroInstructionId.Init, [testNumbers[0]]),
+            new MicroInstruction(MicroInstructionId.Read),
+            new MicroInstruction(MicroInstructionId.Read),
+            halt
+        ]);
+        expect(() => simulationTester.executeAllRam()).toThrow();
     });
 
     test('write', () => {
         try {
-            let instructions: MicroInstruction[] = [new MicroInstruction(InstructionId.Init, testNumbers)];
+            let instructions: MicroInstruction[] = [new MicroInstruction(MicroInstructionId.Init, testNumbers)];
             testNumbers.forEach(() => {
                 instructions.push(new MicroInstruction(MicroInstructionId.Read));
                 instructions.push(new MicroInstruction(MicroInstructionId.Write));
             });
             instructions.push(halt);
             simulationTester.initialize(instructions);
-            simulationTester.executeAll();
+            simulationTester.executeAllRam();
             expect(arraysEqual(simulationTester.ramMachine.output.getFullContents(0)[1], testNumbers)).toBe(true);
         } catch (e) {
             throw new Error(`Simulation failed: ${e}`);
@@ -136,7 +149,7 @@ describe('jumps', () => {
     test('jmp', () => {
         try {
             simulationTester.initialize([
-                new MicroInstruction(InstructionId.Init, testNumbers),
+                new MicroInstruction(MicroInstructionId.Init, testNumbers),
                 new MicroInstruction(MicroInstructionId.Jump, [3]),
                 new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                 new MicroInstruction(MicroInstructionId.Jump, [8]),
@@ -146,12 +159,12 @@ describe('jumps', () => {
                 new MicroInstruction(MicroInstructionId.AssignConst, [0]),
                 halt
             ]);
-            simulationTester.executeAll();
+            simulationTester.executeAllRam();
             expect(simulationTester.ramMachine.A).toBe(0);
             expect(simulationTester.ramMachine.B).toBe(0);
 
             simulationTester.initialize([
-                new MicroInstruction(InstructionId.Init, testNumbers),
+                new MicroInstruction(MicroInstructionId.Init, testNumbers),
                 new MicroInstruction(MicroInstructionId.Jump, [2]),
                 new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                 new MicroInstruction(MicroInstructionId.Jump, [8]),
@@ -161,12 +174,12 @@ describe('jumps', () => {
                 new MicroInstruction(MicroInstructionId.AssignConst, [0]),
                 halt
             ]);
-            simulationTester.executeAll();
+            simulationTester.executeAllRam();
             expect(simulationTester.ramMachine.A).toBe(1);
             expect(simulationTester.ramMachine.B).toBe(0);
 
             simulationTester.initialize([
-                new MicroInstruction(InstructionId.Init, testNumbers),
+                new MicroInstruction(MicroInstructionId.Init, testNumbers),
                 new MicroInstruction(MicroInstructionId.Jump, [2]),
                 new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                 new MicroInstruction(MicroInstructionId.Jump, [5]),
@@ -176,12 +189,12 @@ describe('jumps', () => {
                 new MicroInstruction(MicroInstructionId.AssignConst, [0]),
                 halt
             ]);
-            simulationTester.executeAll();
+            simulationTester.executeAllRam();
             expect(simulationTester.ramMachine.A).toBe(0);
             expect(simulationTester.ramMachine.B).toBe(1);
 
             simulationTester.initialize([
-                new MicroInstruction(InstructionId.Init, testNumbers),
+                new MicroInstruction(MicroInstructionId.Init, testNumbers),
                 new MicroInstruction(MicroInstructionId.Jump, [2]),
                 new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                 new MicroInstruction(MicroInstructionId.Jump, [5]),
@@ -191,7 +204,7 @@ describe('jumps', () => {
                 new MicroInstruction(MicroInstructionId.AssignConst, [0]),
                 halt
             ]);
-            simulationTester.executeAll();
+            simulationTester.executeAllRam();
             expect(simulationTester.ramMachine.A).toBe(1);
             expect(simulationTester.ramMachine.B).toBe(1);
         } catch (e) {
@@ -203,13 +216,13 @@ describe('jumps', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     new MicroInstruction(MicroInstructionId.CondJump, ['==', 4]),
                     new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 if (number === 0) {
                     expect(simulationTester.ramMachine.A).toBe(number);
                 }
@@ -226,13 +239,13 @@ describe('jumps', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     new MicroInstruction(MicroInstructionId.CondJump, ['!=', 4]),
                     new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 if (number !== 0) {
                     expect(simulationTester.ramMachine.A).toBe(number);
                 }
@@ -249,13 +262,13 @@ describe('jumps', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     new MicroInstruction(MicroInstructionId.CondJump, ['<=', 4]),
                     new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 if (number <= 0) {
                     expect(simulationTester.ramMachine.A).toBe(number);
                 }
@@ -272,13 +285,13 @@ describe('jumps', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     new MicroInstruction(MicroInstructionId.CondJump, ['>=', 4]),
                     new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 if (number >= 0) {
                     expect(simulationTester.ramMachine.A).toBe(number);
                 }
@@ -295,13 +308,13 @@ describe('jumps', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     new MicroInstruction(MicroInstructionId.CondJump, ['<', 4]),
                     new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 if (number < 0) {
                     expect(simulationTester.ramMachine.A).toBe(number);
                 }
@@ -318,13 +331,13 @@ describe('jumps', () => {
         for (const number of testNumbers) {
             try {
                 simulationTester.initialize([
-                    new MicroInstruction(InstructionId.Init),
+                    new MicroInstruction(MicroInstructionId.Init),
                     new MicroInstruction(MicroInstructionId.AssignConst, [number]),
                     new MicroInstruction(MicroInstructionId.CondJump, ['>', 4]),
                     new MicroInstruction(MicroInstructionId.AssignConst, [1]),
                     halt
                 ]);
-                simulationTester.executeAll();
+                simulationTester.executeAllRam();
                 if (number > 0) {
                     expect(simulationTester.ramMachine.A).toBe(number);
                 }
@@ -344,7 +357,7 @@ describe('memory', () => {
 
     test('store', () => {
          try {
-            let instructions: MicroInstruction[] = [new MicroInstruction(InstructionId.Init)];
+            let instructions: MicroInstruction[] = [new MicroInstruction(MicroInstructionId.Init)];
             for (let i = 0; i < addresses.length; i++) {
                 const address = addresses[i];
                 const value = values[i];
@@ -370,7 +383,7 @@ describe('memory', () => {
 
             instructions.push(halt);
             simulationTester.initialize(instructions);
-            simulationTester.executeAll();
+            simulationTester.executeAllRam();
         } catch (e) {
             throw new Error(`Simulation failed: ${e}`);
         }
@@ -378,7 +391,7 @@ describe('memory', () => {
 
     test('load', () => {
          try {
-            let instructions: MicroInstruction[] = [new MicroInstruction(InstructionId.Init)];
+            let instructions: MicroInstruction[] = [new MicroInstruction(MicroInstructionId.Init)];
 
             addresses.forEach(address => {
                 instructions.push(new MicroInstruction(MicroInstructionId.AssignConst, [address]));
@@ -412,69 +425,28 @@ describe('memory', () => {
 
             instructions.push(halt);
             simulationTester.initialize(instructions);
-            simulationTester.executeAll();
+            simulationTester.executeAllRam();
         } catch (e) {
             throw new Error(`Simulation failed: ${e}`);
         }
     });
 });
 
-function testArithmetic(operator: string) {
-    let a = shuffleArray(testNumbers, faker);
-    let b = shuffleArray(testNumbers, faker);
-
-    for (let i = 0; i < testNumbers.length; i++) {
-        let result: number;
-
-        switch (operator) {
-            case "+":
-                result = a[i] + b[i];
-                break;
-            case "-":
-                result = a[i] - b[i];
-                break;
-            case "*":
-                result = a[i] * b[i];
-                break;
-            case "/":
-                result = intDiv(a[i], b[i]);
-                break;
-            default:
-                throw new Error("This operator is not known.");
-        }
-
-        try {
-            simulationTester.initialize([
-                new MicroInstruction(InstructionId.Init),
-                new MicroInstruction(MicroInstructionId.AssignConst, [a[i]]),
-                new MicroInstruction(MicroInstructionId.AssignB),
-                new MicroInstruction(MicroInstructionId.AssignConst, [b[i]]),
-                new MicroInstruction(MicroInstructionId.Arithmetic, [operator]),
-                halt
-            ]);
-            simulationTester.executeAll();
-
-            expect(simulationTester.ramMachine.A).toBe(result);
-        } catch (e) {
-            throw new Error(`Simulation failed at input ${a[i]} ${operator} ${b[i]} = ${result}: ${e}`);
-        }
-    }
-}
-
 describe('arithmetic', () => {
+    const operands = generatePairsWithRepetition(testNumbers);
     test('add', () => {
-        //testArithmetic('+');
+        testArithmetic(simulationTester, '+', operands);
     });
 
     test('sub', () => {
-        //testArithmetic('-');
+        testArithmetic(simulationTester, '-', operands);
     });
 
     test('mul', () => {
-        //testArithmetic('*');
+        testArithmetic(simulationTester, '*', operands);
     });
 
     test('div', () => {
-        //testArithmetic('/');
+        testArithmetic(simulationTester, '/', operands);
     });
 });
