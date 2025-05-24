@@ -1,8 +1,9 @@
-import { TapeCondition, TapeAction, Instruction as TuringInstruction } from '../turing/instruction';
-import { Move } from '../tape/move';
-import { TapeSymbol } from '../tape/symbol';
-import { TapeId } from '../turing/tape-id';
-import { logSeparator, IntToMinimalTwosComplement } from '../../utils';
+import { TapeCondition, TapeAction, Instruction as TuringInstruction } from '../turing/instruction.js';
+import { Move } from '../tape/move.js';
+import { TapeSymbol } from '../tape/symbol.js';
+import { TapeId } from '../turing/tape-id.js';
+import { IntToMinimalTwosComplement } from '../../utils/parsing.js';
+import { logSeparator } from '../../utils/logging.js';
 const cond = (tape, ...symbols) => [tape, TapeCondition.multiple(symbols)];
 const tapeAct = (target, source, move) => [target, TapeAction.fromTape(source, move)];
 const litAct = (tape, symbol, move) => [tape, TapeAction.fromLiteral(symbol, move)];

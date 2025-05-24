@@ -1,6 +1,4 @@
 import { Tape } from './tape';
-import { TapeSymbol } from './symbol';
-import { Move } from "./move";
 
 export class SparseTape<T> extends Tape<T> {
     private tape: Map<number, T> = new Map();

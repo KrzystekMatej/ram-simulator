@@ -1,20 +1,21 @@
+import { RamSimulator } from "../core/micro-ram/ram-simulator";
+import { loadFileText } from "../utils/network";
+import {UIRamMachine} from "./ui-ram-machine";
+import {UITuringMachine} from "./ui-turing-machine";
 
+let ramSimulator: RamSimulator;
 
-async function loadFileText(path: string): Promise<string> {
-    const response = await fetch(path)
-    if (!response.ok) {
-        throw new Error(`Chyba při načítání souboru: ${response.statusText}`)
-    }
-    return await response.text()
-}
+const uiRam = new UIRamMachine();
+const uiTuring = new UITuringMachine();
+
 
 loadFileText("/static/assets/turing-sets.txt")
-    .then(program => {
-        console.log("Načtený program:", program)
-        // můžeš ho vložit do textarea např.
-        const textarea = document.querySelectorAll("textarea")[0]
-        if (textarea) textarea.value = program
+    .then(turingSets => {
+        ramSimulator = new RamSimulator(turingSets);
+        uiRam.update(ramSimulator.ramMachine);
+        uiTuring.update(ramSimulator.turingMachine);
     })
     .catch(error => {
-        console.error("Nepodařilo se načíst soubor:", error)
-    })
+        console.error("Nepodařilo se načíst pravidla přechodové funkce turingova stroje:", error);
+    });
+

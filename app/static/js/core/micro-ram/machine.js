@@ -1,7 +1,8 @@
-import { Instruction, InstructionId } from './instruction';
-import { LinearTape } from '../tape/linear';
-import { Move } from '../tape/move';
-import { prefixFunctionErrors, safeAdd, safeIntDiv, safeMul, safeSub } from "../../utils";
+import { Instruction, InstructionId } from './instruction.js';
+import { LinearTape } from '../tape/linear.js';
+import { Move } from '../tape/move.js';
+import { safeAdd, safeIntDiv, safeMul, safeSub } from '../../utils/math.js';
+import { prefixFunctionErrors } from '../../utils/error-handling.js';
 export class Machine {
     constructor() {
         this.ip = 0;
@@ -12,32 +13,32 @@ export class Machine {
         this.input = new LinearTape(undefined);
         this.output = new LinearTape(undefined);
         this.program = [];
-        this.current = new Instruction(InstructionId.Halt);
+        this.currentInstruction = new Instruction(InstructionId.Halt);
     }
     initialize(program) {
         this.reset();
         this.setProgram(program);
-        this.current = this.program[this.ip];
+        this.currentInstruction = this.program[this.ip];
     }
     setProgram(program) {
         this.program.length = 0;
         this.program.push(...program);
     }
     executeProgram() {
-        while (this.current.id === InstructionId.Halt) {
+        while (this.currentInstruction.id === InstructionId.Halt) {
             this.execute();
             this.next();
         }
     }
     next() {
-        if (this.current.id === InstructionId.Halt && this.ip >= this.program.length)
-            return this.current;
+        if (this.currentInstruction.id === InstructionId.Halt && this.ip >= this.program.length)
+            return this.currentInstruction;
         this.ip++;
-        this.current = this.program[this.ip];
-        return this.current;
+        this.currentInstruction = this.program[this.ip];
+        return this.currentInstruction;
     }
     execute() {
-        prefixFunctionErrors(`Execution error at line ${this.ip}: ${this.current.toString()}`, () => Machine.handlers[this.current.id].call(this, ...this.current.args));
+        prefixFunctionErrors(`Execution error at line ${this.ip}: ${this.currentInstruction.toString()}`, () => Machine.handlers[this.currentInstruction.id].call(this, ...this.currentInstruction.args));
     }
     logState() {
         console.log(`[IP: ${this.ip}]`);
@@ -55,7 +56,7 @@ export class Machine {
         this.input.reset();
         this.output.reset();
         this.program.length = 0;
-        this.current = new Instruction(InstructionId.Halt);
+        this.currentInstruction = new Instruction(InstructionId.Halt);
     }
 }
 Machine.handlers = [

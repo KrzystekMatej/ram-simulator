@@ -1,5 +1,6 @@
-import { Instruction, InstructionId } from './instruction';
-import { safeParseInteger, prefixMethodErrors } from '../../utils';
+import { Instruction, InstructionId } from './instruction.js';
+import { safeParseInteger } from '../../utils/parsing.js';
+import { prefixMethodErrors } from '../../utils/error-handling.js';
 export class Compiler {
     compile(text) {
         let instructions = [];

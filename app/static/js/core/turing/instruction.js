@@ -1,7 +1,7 @@
-import { TapeId } from "./tape-id";
-import { TapeSymbol } from "../tape/symbol";
-import { removeWhitespace, splitOnce as splitByFirst } from "../../utils";
-import { Move } from "../tape/move";
+import { TapeId } from "./tape-id.js";
+import { TapeSymbol } from "../tape/symbol.js";
+import { removeWhitespace, splitOnce as splitByFirst } from "../../utils/parsing.js";
+import { Move } from "../tape/move.js";
 export class TapeCondition {
     constructor(allowedSymbols) {
         this.allowedSymbols = allowedSymbols;

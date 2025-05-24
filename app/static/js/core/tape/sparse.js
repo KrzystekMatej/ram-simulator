@@ -1,4 +1,4 @@
-import { Tape } from './tape';
+import { Tape } from './tape.js';
 export class SparseTape extends Tape {
     constructor() {
         super(...arguments);

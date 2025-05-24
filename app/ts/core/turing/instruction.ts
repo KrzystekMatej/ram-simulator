@@ -1,7 +1,7 @@
 import { TapeId } from "./tape-id";
 import { TapeSymbol } from "../tape/symbol";
-import { removeWhitespace, splitOnce as splitByFirst } from "../../utils";
-import { Move } from "../tape/move"
+import { removeWhitespace, splitOnce as splitByFirst } from "../../utils/parsing";
+import { Move } from "../tape/move";
 
 export type SymbolWrite =
   | { type: 'literal'; symbol: TapeSymbol }

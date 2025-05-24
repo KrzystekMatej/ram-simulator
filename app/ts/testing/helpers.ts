@@ -1,6 +1,6 @@
 import { Faker } from '@faker-js/faker';
 import {RamSimulator as SimulationTester} from "../core/micro-ram/ram-simulator";
-import {intDiv} from "../utils";
+import { intDiv } from "../utils/math";
 import {Instruction as MicroInstruction, InstructionId as MicroInstructionId} from "../core/micro-ram/instruction";
 
 export function prepareTestNumbers(): number[] {

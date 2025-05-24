@@ -1,4 +1,4 @@
-import { Instruction as MicroInstruction, InstructionId, InstructionId as MicroInstructionId } from '../micro-ram/instruction';
+import { Instruction as MicroInstruction, InstructionId, InstructionId as MicroInstructionId } from '../micro-ram/instruction.js';
 export class ToMicroTranspiler {
     transpile(ramInstructions) {
         let microInstructions = [];

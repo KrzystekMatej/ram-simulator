@@ -12,8 +12,8 @@ import {
     Instruction as MicroInstruction,
     InstructionId as MicroInstructionId
 } from "../../core/micro-ram/instruction";
-import {arraysEqual, intDiv} from "../../utils";
-import {cs_CZ, Faker} from '@faker-js/faker';
+import { arraysEqual } from "../../utils/collections"
+import { cs_CZ, Faker } from '@faker-js/faker';
 
 const originalConsoleLog = console.log;
 console.log = () => {};

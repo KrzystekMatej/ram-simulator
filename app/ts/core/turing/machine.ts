@@ -1,10 +1,11 @@
-import { SparseTape } from '../tape/sparse';
 import { LinearTape } from '../tape/linear';
 import { TapeSymbol } from '../tape/symbol';
 import { Tape } from '../tape/tape';
 import { TapeAction, Instruction, Instruction as TuringInstruction } from './instruction';
 import { TapeId } from './tape-id';
-import { indexOfLeft, indexOfRight, logSeparator, twosComplementToInt } from '../../utils';
+import { indexOfLeft, indexOfRight } from '../../utils/collections';
+import { twosComplementToInt } from '../../utils/parsing';
+import { logSeparator } from '../../utils/logging';
 
 export class Machine {
     tapes: Tape<TapeSymbol>[] = [
@@ -19,7 +20,7 @@ export class Machine {
 
     state: string = "halt";
     program: Map<string, Instruction[]> = new Map();
-    current: Instruction = Instruction.createNop("halt");
+    currentInstruction: Instruction = Instruction.createNop("halt");
 
     getRegisterContents(tapeId: TapeId): number {
         if (tapeId > TapeId.T) throw new Error(`The contents of tape ${tapeId} can't be described as a number!`);
@@ -87,7 +88,7 @@ export class Machine {
         this.reset();
         this.setProgram(initProgram);
         this.state = "0_start";
-        this.current = this.getSatisfied();
+        this.currentInstruction = this.getSatisfied();
     }
 
     setProgram(program: Map<string, Instruction[]>): void {
@@ -102,18 +103,18 @@ export class Machine {
 
         while (!this.state.includes("halt")) {
             this.execute();
-            if (this.current.target.includes('start')) return;
+            if (this.currentInstruction.target.includes('start')) return;
             this.next();
         }
     }
 
     next(): Instruction {
-        if (this.state.includes("halt")) return this.current;
+        if (this.state.includes("halt")) return this.currentInstruction;
 
-        this.state = this.current.target;
+        this.state = this.currentInstruction.target;
         if (this.state.includes("error")) throw new Error(`Transitioning to error state: ${this.state}`);
-        this.current = this.getSatisfied();
-        return this.current;
+        this.currentInstruction = this.getSatisfied();
+        return this.currentInstruction;
     }
 
     getSatisfied(): Instruction {
@@ -150,8 +151,8 @@ export class Machine {
     execute(): void {
         let headReads = this.getHeadReads();
 
-        for (let i = 0; i < this.current.actions.length; i++) {
-            const action = this.current.actions[i];
+        for (let i = 0; i < this.currentInstruction.actions.length; i++) {
+            const action = this.currentInstruction.actions[i];
             this.executeAction(i, action, headReads);
         }
     }

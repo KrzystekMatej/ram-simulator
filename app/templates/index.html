@@ -7,102 +7,101 @@
         <div class="card border rounded-0 mb-3">
             <div class="card-header bg-light fw-bold">Řídící jednotka</div>
             <div class="card-body d-flex align-items-center ">
-                <div class="fw-bold me-3" style="width: 30px;">4</div>
-                <div class="flex-grow-1 bg-body-secondary border p-1">R2 := [R5]</div>
+                <div class="fw-bold me-3" style="width: 30px;" id="ram-ip">4</div>
+                <div class="flex-grow-1 bg-body-secondary border p-1" id="ram-instruction">R2 := [R5]</div>
                 <button class="btn play-btn d-flex align-items-center justify-content-center p-0">
                     <span class="play-icon"></span>
                 </button>
             </div>
         </div>
 
-        <!-- Registry -->
-        <div class="card border rounded-0 mb-3">
+        <div class="card border rounded-0 mb-3" id="ram-memory">
             <div class="card-header bg-light fw-bold">Registry</div>
-            <div class="card-body ">
+            <div class="card-body" id="ram-memory-registers">
                 <div class="d-flex align-items-center mb-2">
                     <div class="fw-bold me-3" style="width: 30px;">A:</div>
-                    <div class="flex-fill border p-1">0</div>
+                    <div class="flex-fill border p-1" id="ram-memory-a">0</div>
                 </div>
                 <div class="d-flex align-items-center mb-2">
                     <div class="fw-bold me-3" style="width: 30px;">B:</div>
-                    <div class="flex-fill border p-1">0</div>
+                    <div class="flex-fill border p-1 register-value" id="ram-memory-b">0</div>
                 </div>
                 <div class="d-flex align-items-center">
                     <div class="fw-bold me-3" style="width: 30px;">C:</div>
-                    <div class="flex-fill border p-1">0</div>
+                    <div class="flex-fill border p-1 register-value" id="ram-memory-c">0</div>
                 </div>
             </div>
 
             <div class="card-header bg-light fw-bold text-start border-bottom border-top">Hlavní paměť</div>
-            <div class="card-body ">
-                <div class="d-flex text-center">
-                    <div class="flex-fill border p-1 d-flex flex-column">
-                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1">0</div>
-                        <div class="flex-grow-1 pb-1 pt-1">0</div>
+            <div class="card-body">
+                <div class="d-flex text-center" id="ram-memory-m">
+                    <div class="flex-fill border p-1 d-flex flex-column memory-item">
+                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">0</div>
+                        <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
-                    <div class="flex-fill border p-1 d-flex flex-column">
-                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1">1</div>
-                        <div class="flex-grow-1 pb-1 pt-1">0</div>
+                    <div class="flex-fill border p-1 d-flex flex-column memory-item">
+                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">1</div>
+                        <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
-                    <div class="flex-fill border p-1 d-flex flex-column">
-                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1">2</div>
-                        <div class="flex-grow-1 pb-1 pt-1">0</div>
+                    <div class="flex-fill border p-1 d-flex flex-column memory-item">
+                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">2</div>
+                        <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
-                    <div class="flex-fill border p-1 d-flex flex-column">
-                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1">3</div>
-                        <div class="flex-grow-1 pb-1 pt-1">0</div>
+                    <div class="flex-fill border p-1 d-flex flex-column memory-item">
+                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">3</div>
+                        <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
-                    <div class="flex-fill border p-1 d-flex flex-column">
-                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1">4</div>
-                        <div class="flex-grow-1 pb-1 pt-1">0</div>
+                    <div class="flex-fill border p-1 d-flex flex-column memory-item">
+                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">4</div>
+                        <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
-                    <div class="flex-fill border p-1 d-flex flex-column">
-                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1">5</div>
-                        <div class="flex-grow-1 pb-1 pt-1">0</div>
+                    <div class="flex-fill border p-1 d-flex flex-column memory-item">
+                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">5</div>
+                        <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
-                    <div class="flex-fill border p-1 d-flex flex-column">
-                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1">6</div>
-                        <div class="flex-grow-1 pb-1 pt-1">0</div>
+                    <div class="flex-fill border p-1 d-flex flex-column memory-item">
+                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">6</div>
+                        <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
-                    <div class="flex-fill border p-1 d-flex flex-column">
-                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1">7</div>
-                        <div class="flex-grow-1 pb-1 pt-1">0</div>
+                    <div class="flex-fill border p-1 d-flex flex-column memory-item">
+                        <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">7</div>
+                        <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
                 </div>
             </div>
 
             <div class="card-header bg-light fw-bold border-bottom border-top">Vstup/Výstup</div>
-            <div class="card-body" id="io-tapes">
-                <div class="d-flex align-items-center mb-2">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2" id="ram-memory-i">
                     <div class="fw-bold me-3" style="width: 30px;">I:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center" id="ram-memory-o">
                     <div class="fw-bold me-3" style="width: 30px;">O:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
             </div>
@@ -110,17 +109,17 @@
 
         <div class="card border rounded-0 mb-3 flex-grow-1 d-flex flex-column">
             <div class="card-header bg-light fw-bold">Program</div>
-            <div class="card-body d-flex gap-3 flex-grow-1">
+            <div class="card-body d-flex gap-3 flex-grow-1" id="ram-programs">
                 <div class="d-flex flex-column flex-fill">
                     <div class="fw-bold mb-2">Makro RAM</div>
-                    <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10"></textarea>
+                    <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="ram-program-macro"></textarea>
                     <div class="mt-2">
                         <button class="btn btn-dark-hover text-white w-100 rounded-0">Načíst</button>
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-fill">
                     <div class="fw-bold mb-2">Mikro RAM</div>
-                    <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10"></textarea>
+                    <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="ram-program-micro"></textarea>
                 </div>
             </div>
         </div>
@@ -130,137 +129,136 @@
         <div class="card border rounded-0 mb-3">
             <div class="card-header bg-light fw-bold">Řídící jednotka</div>
             <div class="card-body d-flex align-items-center ">
-                <div class="fw-bold me-3" style="width: 30px;">q7</div>
-                <div class="flex-grow-1 bg-body-secondary border p-1">δ(q7, 1) = (q9, 0, →)</div>
+                <div class="fw-bold me-3" style="width: 30px;" id="turing-state">q7</div>
+                <div class="flex-grow-1 bg-body-secondary border p-1" id="turing-instruction">δ(q7, 1) = (q9, 0, →)</div>
                 <button class="btn play-btn d-flex align-items-center justify-content-center p-0">
                     <span class="play-icon"></span>
                 </button>
             </div>
         </div>
 
-        <!-- Pásky A, B, C -->
-        <div class="card border rounded-0 mb-3" id="tapes">
+        <div class="card border rounded-0 mb-3" id="turing-memory">
             <div class="card-header bg-light fw-bold">Pásky registrů</div>
-            <div class="card-body " id="register-tapes">
-                <div class="d-flex align-items-center mb-2">
+            <div class="card-body " id="turing-memory-registers">
+                <div class="d-flex align-items-center mb-2" id="turing-memory-a">
                     <div class="fw-bold me-3" style="width: 30px;">A:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center mb-2">
+                <div class="d-flex align-items-center mb-2" id="turing-memory-b">
                     <div class="fw-bold me-3" style="width: 30px;">B:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center mb-2">
+                <div class="d-flex align-items-center mb-2" id="turing-memory-c">
                     <div class="fw-bold me-3" style="width: 30px;">C:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center" id="turing-memory-t">
                     <div class="fw-bold me-3" style="width: 30px;">T:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
             </div>
 
             <div class="card-header bg-light fw-bold border-bottom border-top">Páska hlavní paměti</div>
-            <div class="card-body" id="memory-tape">
-                <div class="d-flex align-items-center">
+            <div class="card-body">
+                <div class="d-flex align-items-center" id="turing-memory-m">
                     <div class="fw-bold me-3" style="width: 30px;">M:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
             </div>
 
             <div class="card-header bg-light fw-bold border-bottom border-top">Vstup/Výstup</div>
-            <div class="card-body" id="io-tapes">
-                <div class="d-flex align-items-center mb-2">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2" id="turing-memory-i">
                     <div class="fw-bold me-3" style="width: 30px;">I:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center" id="turing-memory-o">
                     <div class="fw-bold me-3" style="width: 30px;">O:</div>
-                    <div class="d-flex flex-grow-1 text-center">
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
-                        <div class="flex-fill border p-1">□</div>
+                    <div class="d-flex flex-grow-1 text-center tape-contents">
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <div class="flex-fill border p-1 tape-item">□</div>
                     </div>
                 </div>
             </div>
@@ -269,7 +267,7 @@
         <div class="card border rounded-0 mb-3 flex-grow-1 d-flex flex-column">
             <div class="card-header bg-light fw-bold">Přechodová funkce</div>
             <div class="card-body d-flex flex-column flex-grow-1">
-                <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10"></textarea>
+                <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="turing-program"></textarea>
             </div>
         </div>
     </div>

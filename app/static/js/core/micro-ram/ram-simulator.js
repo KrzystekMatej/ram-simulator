@@ -1,9 +1,11 @@
-import { InstructionId as RamInstructionId } from "../../core/micro-ram/instruction";
-import { Machine as RamMachine } from "../../core/micro-ram/machine";
-import { ToTuringTranspiler as RamToTuringTranspiler } from "../../core/micro-ram/to-turing-transpiler";
-import { Machine as TuringMachine } from "../../core/turing/machine";
-import { TapeId } from "../turing/tape-id";
-import { arraysEqual, logSeparator, mapsEqual, prefixMethodErrors } from "../../utils";
+import { InstructionId as RamInstructionId } from "../../core/micro-ram/instruction.js";
+import { Machine as RamMachine } from "../../core/micro-ram/machine.js";
+import { ToTuringTranspiler as RamToTuringTranspiler } from "../../core/micro-ram/to-turing-transpiler.js";
+import { Machine as TuringMachine } from "../../core/turing/machine.js";
+import { TapeId } from "../turing/tape-id.js";
+import { arraysEqual, mapsEqual } from '../../utils/collections.js';
+import { prefixMethodErrors } from '../../utils/error-handling.js';
+import { logSeparator } from '../../utils/logging.js';
 export class RamSimulator {
     constructor(turingSets, checkConsistency = false, verbose = false) {
         this.ramMachine = new RamMachine();
@@ -18,7 +20,7 @@ export class RamSimulator {
     }
     initialize(instructions) {
         this.ramMachine.initialize(instructions);
-        this.turingMachine.initialize(this.transpiler.transpile(this.ramMachine.current, this.ramMachine.ip));
+        this.turingMachine.initialize(this.transpiler.transpile(this.ramMachine.currentInstruction, this.ramMachine.ip));
         this.initialized = true;
     }
     ramStep(executeTuring = true) {
@@ -42,14 +44,14 @@ export class RamSimulator {
         if (!this.initialized)
             throw new Error("Simulation error: Uninitialized!");
         prefixMethodErrors("Turing machine error: ", this.turingMachine.execute, this.turingMachine);
-        if (this.turingMachine.current.target.includes("start")) {
+        if (this.turingMachine.currentInstruction.target.includes("start")) {
             this.ramStep(false);
-            return this.turingMachine.current;
+            return this.turingMachine.currentInstruction;
         }
         return prefixMethodErrors("Turing machine error: ", this.turingMachine.next, this.turingMachine);
     }
     areMachineStatesConsistent() {
-        return (this.turingMachine.state === `${this.ramMachine.ip}_start` || (this.turingMachine.state.includes("halt") && this.ramMachine.current.id === RamInstructionId.Halt)) &&
+        return (this.turingMachine.state === `${this.ramMachine.ip}_start` || (this.turingMachine.state.includes("halt") && this.ramMachine.currentInstruction.id === RamInstructionId.Halt)) &&
             this.turingMachine.getRegisterContents(TapeId.A) === this.ramMachine.A &&
             this.turingMachine.getRegisterContents(TapeId.B) === this.ramMachine.B &&
             this.turingMachine.getRegisterContents(TapeId.C) === this.ramMachine.C &&

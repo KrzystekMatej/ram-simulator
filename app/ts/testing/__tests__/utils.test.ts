@@ -1,5 +1,5 @@
 
-import { IntToMinimalTwosComplement, twosComplementToInt } from '../../utils';
+import { IntToMinimalTwosComplement, twosComplementToInt } from '../../utils/parsing';
 
 describe('Twos complement conversion', () => {
     const safeNumbers: [number, string][] = [

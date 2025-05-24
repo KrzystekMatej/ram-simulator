@@ -2,9 +2,10 @@ import {
     Instruction,
     InstructionId
 } from './instruction';
-import { LinearTape } from '../tape/linear'
+import { LinearTape } from '../tape/linear';
 import { Move } from '../tape/move';
-import { intDiv, prefixFunctionErrors, prefixMethodErrors, safeAdd, safeIntDiv, safeMul, safeSub } from "../../utils";
+import { safeAdd, safeIntDiv, safeMul, safeSub  } from '../../utils/math';
+import { prefixFunctionErrors } from '../../utils/error-handling';
 
 export class Machine {
     ip: number = 0;
@@ -19,7 +20,7 @@ export class Machine {
     output: LinearTape<number | undefined> = new LinearTape(undefined);
 
     program: Instruction[] = [];
-    current: Instruction = new Instruction(InstructionId.Halt);
+    currentInstruction: Instruction = new Instruction(InstructionId.Halt);
 
     static readonly handlers: ((this: Machine, ...args: any[]) => void)[] = [
         function init(...inputs: number[]) {
@@ -96,7 +97,7 @@ export class Machine {
     initialize(program: Instruction[]): void {
         this.reset();
         this.setProgram(program);
-        this.current = this.program[this.ip];
+        this.currentInstruction = this.program[this.ip];
     }
 
     setProgram(program: Instruction[]): void {
@@ -105,21 +106,21 @@ export class Machine {
     }
 
     executeProgram() {
-        while (this.current.id === InstructionId.Halt) {
+        while (this.currentInstruction.id === InstructionId.Halt) {
             this.execute();
             this.next();
         }
     }
 
     next(): Instruction {
-        if (this.current.id === InstructionId.Halt && this.ip >= this.program.length) return this.current;
+        if (this.currentInstruction.id === InstructionId.Halt && this.ip >= this.program.length) return this.currentInstruction;
         this.ip++;
-        this.current = this.program[this.ip];
-        return this.current;
+        this.currentInstruction = this.program[this.ip];
+        return this.currentInstruction;
     }
 
     execute(): void {
-        prefixFunctionErrors(`Execution error at line ${this.ip}: ${this.current.toString()}`, () => Machine.handlers[this.current.id].call(this, ...this.current.args))
+        prefixFunctionErrors(`Execution error at line ${this.ip}: ${this.currentInstruction.toString()}`, () => Machine.handlers[this.currentInstruction.id].call(this, ...this.currentInstruction.args))
     }
 
     logState(): void {
@@ -139,7 +140,7 @@ export class Machine {
         this.input.reset();
         this.output.reset();
         this.program.length = 0;
-        this.current = new Instruction(InstructionId.Halt);
+        this.currentInstruction = new Instruction(InstructionId.Halt);
     }
 }
 

@@ -1,9 +1,10 @@
 import { Instruction as RamInstruction } from './instruction';
 import { TapeCondition, TapeAction, Instruction as TuringInstruction } from '../turing/instruction';
-import { Move } from '../tape/move'
+import { Move } from '../tape/move';
 import { TapeSymbol } from '../tape/symbol';
 import { TapeId } from '../turing/tape-id';
-import { logSeparator, IntToMinimalTwosComplement } from '../../utils';
+import { IntToMinimalTwosComplement } from '../../utils/parsing';
+import { logSeparator } from '../../utils/logging';
 
 const cond = (tape: TapeId, ...symbols: TapeSymbol[]): [TapeId, TapeCondition] => [tape, TapeCondition.multiple(symbols)];
 const tapeAct = (target: TapeId, source: TapeId, move: Move): [TapeId, TapeAction] => [target, TapeAction.fromTape(source, move)];

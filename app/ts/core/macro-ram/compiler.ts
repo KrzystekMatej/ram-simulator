@@ -1,5 +1,6 @@
 import { Instruction, InstructionId } from './instruction';
-import { safeParseInteger, prefixMethodErrors } from '../../utils';
+import { safeParseInteger } from '../../utils/parsing';
+import { prefixMethodErrors } from '../../utils/error-handling'
 
 export class Compiler {
 

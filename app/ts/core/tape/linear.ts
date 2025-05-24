@@ -1,5 +1,4 @@
 import { Tape } from './tape';
-import { Move } from "./move";
 
 export class LinearTape<T> extends Tape<T> {
     private tape: T[] = [];
