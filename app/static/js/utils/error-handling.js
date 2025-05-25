@@ -3,8 +3,7 @@ export function prefixFunctionErrors(prefix, fn, ...args) {
         return fn(...args);
     }
     catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        throw new Error(`${prefix}${message}`);
+        throw new Error(`${prefix}${getErrorMessage(err)}`);
     }
 }
 export function prefixMethodErrors(prefix, method, thisArg, ...args) {
@@ -12,7 +11,12 @@ export function prefixMethodErrors(prefix, method, thisArg, ...args) {
         return method.apply(thisArg, args);
     }
     catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        throw new Error(`${prefix}${msg}`);
+        throw new Error(`${prefix}${getErrorMessage(err)}`);
     }
+}
+export function getErrorMessage(error) {
+    if (error instanceof Error) {
+        return error.message;
+    }
+    return String(error);
 }

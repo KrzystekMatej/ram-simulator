@@ -147,7 +147,7 @@ export class ToMicroTranspiler {
     ];
 
 
-    transpile(ramInstructions: MacroInstruction[]): MicroInstruction[] {
+    transpile(ramInstructions: MacroInstruction[]): [MicroInstruction[], Map<number, number>] {
         let microInstructions: MicroInstruction[] = []
         let indexMap: Map<number, number> = new Map();
 
@@ -167,6 +167,6 @@ export class ToMicroTranspiler {
                 instruction.args[1] = indexMap.get(instruction.args[1]);
         }
 
-        return microInstructions;
+        return [microInstructions, indexMap];
     }
 }

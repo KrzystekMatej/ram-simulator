@@ -15,7 +15,7 @@ export function IntToMinimalTwosComplement(value: number): string {
     if (value === 0) return '0';
 
     if (!Number.isSafeInteger(value)) {
-        throw new Error(`Conversion error: ${value} is not a safe integer`);
+        throw new Error(`Nepodařilo se převést číslo ${value} na řetěze - nejedná se o bezpečné číslo typu 'number' (64bit float)`);
     }
 
     if (value > 0) {
@@ -55,7 +55,7 @@ export function twosComplementToInt(bin: string): number {
     const result = Number(value);
 
     if (!Number.isSafeInteger(result)) {
-        throw new Error(`Parsing error: ${bin}`);
+        throw new Error(`Nepodařilo se převést ${bin} na bezpečné číslo typu 'number' (64bit float)`);
     }
 
     return result;
@@ -63,9 +63,9 @@ export function twosComplementToInt(bin: string): number {
 
 export function safeParseInteger(str: string): number | undefined {
     const n = Number(str);
-    if (Number.isSafeInteger(n))
+    if (!Number.isSafeInteger(n))
     {
-        throw new Error(`Parsing error: ${str}`);
+        throw new Error(`Nepodařilo se převést ${str} na bezpečné číslo typu 'number' (64bit float)`);
     }
     return n;
 }

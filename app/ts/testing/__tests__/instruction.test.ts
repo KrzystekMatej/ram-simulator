@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import {RamSimulator as SimulationTester} from "../../core/micro-ram/ram-simulator";
+import {RamTuringSimulator as SimulationTester} from "../../core/ram-turing-simulator";
 import {
     generatePairsWithRepetition,
     prepareTestNumbers,

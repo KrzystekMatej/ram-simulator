@@ -1,5 +1,5 @@
 import { Faker } from '@faker-js/faker';
-import {RamSimulator as SimulationTester} from "../core/micro-ram/ram-simulator";
+import {RamTuringSimulator as SimulationTester} from "../core/ram-turing-simulator";
 import { intDiv } from "../utils/math";
 import {Instruction as MicroInstruction, InstructionId as MicroInstructionId} from "../core/micro-ram/instruction";
 

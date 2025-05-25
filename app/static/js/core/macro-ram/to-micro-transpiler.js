@@ -14,7 +14,7 @@ export class ToMicroTranspiler {
             else if (instruction.id === MicroInstructionId.CondJump)
                 instruction.args[1] = indexMap.get(instruction.args[1]);
         }
-        return microInstructions;
+        return [microInstructions, indexMap];
     }
 }
 ToMicroTranspiler.handlers = [

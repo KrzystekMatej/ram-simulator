@@ -83,7 +83,7 @@ export class Machine {
         },
         function read() {
             const value = this.input.read();
-            if (value === undefined) throw new Error("Missing input");
+            if (value === undefined) throw new Error("Selhalo čtení ze vstupní pásky.");
             this.input.move(Move.Right);
             this.A = value as number;
         },
@@ -120,7 +120,8 @@ export class Machine {
     }
 
     execute(): void {
-        prefixFunctionErrors(`Execution error at line ${this.ip}: ${this.currentInstruction.toString()}`, () => Machine.handlers[this.currentInstruction.id].call(this, ...this.currentInstruction.args))
+        prefixFunctionErrors(`Chyba při vykonávání programu na řádku ${this.ip}: ${this.currentInstruction.toString()} - `,
+            () => Machine.handlers[this.currentInstruction.id].call(this, ...this.currentInstruction.args));
     }
 
     logState(): void {

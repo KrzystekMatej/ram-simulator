@@ -11,7 +11,7 @@ export function safeNumberOperation(operation: (...args: number[]) => number, ..
 export function safeAdd(a: number, b: number): number {
     const result = safeNumberOperation((x, y) => x + y, a, b);
     if (result === undefined) {
-        throw new Error(`Integer overflow: ${a} + ${b}`);
+        throw new Error(`Došlo k přetečení Javascript typu 'number' při operaci: ${a} + ${b}`);
     }
     return result;
 }
@@ -19,7 +19,7 @@ export function safeAdd(a: number, b: number): number {
 export function safeSub(a: number, b: number): number {
     const result = safeNumberOperation((x, y) => x - y, a, b);
     if (result === undefined) {
-        throw new Error(`Integer overflow: ${a} - ${b}`);
+        throw new Error(`Došlo k přetečení Javascript typu 'number' při operaci: ${a} - ${b}`);
     }
     return result;
 }
@@ -27,17 +27,17 @@ export function safeSub(a: number, b: number): number {
 export function safeMul(a: number, b: number): number {
     const result = safeNumberOperation((x, y) => x * y, a, b);
     if (result === undefined) {
-        throw new Error(`Integer overflow: ${a} * ${b}`);
+        throw new Error(`Došlo k přetečení Javascript typu 'number' při operaci: ${a} * ${b}`);
     }
     return result;
 }
 
 export function safeIntDiv(a: number, b: number): number {
-    if (b === 0) throw new Error(`Division by zero: ${a} / ${b}`);
+    if (b === 0) throw new Error(`Dělení nulou: ${a} / ${b}`);
 
     const result = safeNumberOperation((x, y) => intDiv(x, y), a, b);
     if (result === undefined) {
-        throw new Error(`Integer overflow: ${a} / ${b}`);
+        throw new Error(`Došlo k přetečení Javascript typu 'number' při operaci: ${a} / ${b}`);
     }
     return result;
 }

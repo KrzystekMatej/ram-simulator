@@ -1,0 +1,36 @@
+import { UISymbolTape } from "./memory/symbol-tape.js";
+import { toInlineLatex } from "../../utils/latex.js";
+export class UITuringMachine {
+    constructor(sourceMachine) {
+        this.sourceMachine = sourceMachine;
+        this.currentInstruction = document.getElementById("turing-instruction");
+        this.tapes = [
+            new UISymbolTape(this.sourceMachine.tapes[0], "turing-memory-a"),
+            new UISymbolTape(this.sourceMachine.tapes[1], "turing-memory-b"),
+            new UISymbolTape(this.sourceMachine.tapes[2], "turing-memory-c"),
+            new UISymbolTape(this.sourceMachine.tapes[3], "turing-memory-t"),
+            new UISymbolTape(this.sourceMachine.tapes[4], "turing-memory-m"),
+            new UISymbolTape(this.sourceMachine.tapes[5], "turing-memory-i"),
+            new UISymbolTape(this.sourceMachine.tapes[6], "turing-memory-o")
+        ];
+        this.program = document.getElementById("turing-program");
+    }
+    update(resetTapeOffsets = true) {
+        if (!resetTapeOffsets)
+            this.resetTapeOffsets();
+        this.currentInstruction.innerHTML = toInlineLatex(this.sourceMachine.currentInstruction.toLatex(this.sourceMachine.state));
+        console.log(toInlineLatex(this.sourceMachine.currentInstruction.toLatex(this.sourceMachine.state)));
+        MathJax.typeset([this.currentInstruction]);
+        this.tapes.forEach((tape) => tape.update());
+        this.program.value = Array.from(this.sourceMachine.program)
+            .map(([state, instructions]) => instructions
+            .map(instruction => toInlineLatex(instruction.toLatex(state)))
+            .join("\n"))
+            .join("\n");
+    }
+    resetTapeOffsets() {
+        this.tapes.forEach((tape) => {
+            tape.headOffset = 0;
+        });
+    }
+}

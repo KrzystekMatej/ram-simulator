@@ -6,8 +6,7 @@ export function prefixFunctionErrors<TArgs extends any[], TResult>(
     try {
         return fn(...args);
     } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        throw new Error(`${prefix}${message}`);
+        throw new Error(`${prefix}${getErrorMessage(err)}`);
     }
 }
 
@@ -20,7 +19,13 @@ export function prefixMethodErrors<T, TArgs extends any[], TResult>(
     try {
         return method.apply(thisArg, args);
     } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        throw new Error(`${prefix}${msg}`);
+        throw new Error(`${prefix}${getErrorMessage(err)}`);
     }
+}
+
+export function getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+        return error.message;
+    }
+    return String(error);
 }

@@ -5,7 +5,7 @@
 }
 
 .btn-dark-hover:hover {
-    background-color: #343a40; /* o něco světlejší */
+    background-color: #343a40;
 }
 
 .play-btn {
@@ -29,4 +29,131 @@
     border-bottom: 8px solid transparent;
     border-left: 12px solid white;
     margin-left: 2px;
+}
+
+.inline-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.inline-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.math-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.math-scroll > * {
+    display: inline-block;
+    min-width: max-content;
+}
+
+.tape-cell {
+    width: 2.5rem;
+    height: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.tape-item {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    white-space: nowrap;
+}
+
+.tape-item::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tape-head {
+    background-color: white;
+    color: #212529;
+    font-weight: bold;
+    border: 2px solid #212529 !important;
+}
+
+.tape-head::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #212529;
+    z-index: 2;
+}
+
+.memory-item{
+    flex: 1 1 0;
+    width:   3.5rem;
+    min-width: 0;
+    height:  5rem;
+
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+
+.memory-item-address,
+.memory-item-value{
+    flex: 1 1 0;
+    min-width:0;
+    overflow-x:auto;
+    white-space:nowrap;
+    text-align:center;
+    padding:0 .25rem;
+}
+
+
+.memory-item-address::-webkit-scrollbar,
+.memory-item-value::-webkit-scrollbar{height:4px;}
+
+
+/* společné parametry (stejná výška jako buňka pásky = 2.5 rem) */
+.scroll-btn{
+    width: 1.75rem;           /* úzké, ať nepřekáží */
+    height: 2.5rem;           /* = .tape-cell/.memory-item height  */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#212529;
+    border:none;
+    border-radius:3px;
+    padding:0;
+    cursor:pointer;
+    transition:background-color .2s ease;
+}
+.scroll-btn:hover{background:#343a40}
+
+/* samotná šipka – dědí směr z modifikátoru .left / .right */
+.scroll-btn::before{
+    content:"";
+    display:block;
+    width:0; height:0;
+    border-top:8px solid transparent;
+    border-bottom:8px solid transparent;
+    border-left:12px solid #fff; /* default = ► */
+    /* zarovnání na střed */
+    margin-left:2px;
+}
+
+/* levé tlačítko – stejná šipka, jen otočíme o 180 ° */
+.scroll-btn.left::before{
+    transform:rotate(180deg);   /* ⇦ */
+    margin-left:0;              /* aby byla opět vycentrovaná */
+}
+
+/* pravé lze buď nechat default ( ► ), nebo přidat .right pro čitelnost */
+.scroll-btn.right::before{
+    /* žádná změna, jen semantický háček */
 }

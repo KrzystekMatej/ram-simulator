@@ -1,5 +1,5 @@
 import { TapeId } from "./tape-id";
-import { TapeSymbol } from "../tape/symbol";
+import {symbolToLatex, TapeSymbol} from "../tape/symbol";
 import { removeWhitespace, splitOnce as splitByFirst } from "../../utils/parsing";
 import { Move } from "../tape/move";
 
@@ -37,6 +37,14 @@ export class TapeCondition {
             return `${TapeId[pIndex]}_(${TapeId[pIndex].toLowerCase()})`;
         }
     }
+
+    toLatex(pIndex: TapeId): string {
+        if (this.allowedSymbols.length === 1 && this.allowedSymbols[0] !== TapeSymbol.Wildcard) {
+            return `(${symbolToLatex(this.allowedSymbols[0])})_${TapeId[pIndex]}`;
+        } else {
+            return `(${TapeId[pIndex].toLowerCase()})_${TapeId[pIndex]}`;
+        }
+    }
 }
 
 export class TapeAction {
@@ -56,7 +64,7 @@ export class TapeAction {
         return new TapeAction({ type: 'fromTape', sourceTape: tapeId }, move);
     }
 
-    toString(pIndex: TapeId, condition: TapeCondition): string {
+    toString(pIndex: TapeId): string {
         let value: string;
         if (this.write.type === 'literal') {
             value = `${this.write.symbol}`;
@@ -67,6 +75,16 @@ export class TapeAction {
         return `${TapeId[pIndex]}_(${value}, ${this.move >= 0 ? '+' : ''}${this.move})`;
     }
 
+    toLatex(pIndex: TapeId): string {
+        let value: string;
+        if (this.write.type === 'literal') {
+            value = `${symbolToLatex(this.write.symbol)}`;
+        } else {
+            value = `${TapeId[this.write.sourceTape].toLowerCase()}`;
+        }
+
+        return `(${value}, ${this.move >= 0 ? '+' : ''}${this.move})_${TapeId[pIndex]}`;
+    }
 }
 
 export class Instruction {
@@ -125,7 +143,7 @@ export class Instruction {
             const cond = this.conditions[i];
             const act = this.actions[i];
 
-            const actIsActive = !(act.write.type === 'fromTape' && act.write.sourceTape === i && act.move === Move.Stay);;
+            const actIsActive = !(act.write.type === 'fromTape' && act.write.sourceTape === i && act.move === Move.Stay);
             const condIsActive = !cond.matches(TapeSymbol.Wildcard)
     
             if (actIsActive || condIsActive) relevant.push(i);
@@ -138,7 +156,7 @@ export class Instruction {
             .join(', ');
     
         const acts = relevant
-            .map(i => this.actions[i].toString(i, this.conditions[i]))
+            .map(i => this.actions[i].toString(i))
             .join(', ');
 
         const constraints: string[] = [];
@@ -271,6 +289,51 @@ export class Instruction {
         }
     
         return [source, new Instruction(target, conds, acts)];
+    }
+
+    toLatex(source: string) : string {
+        const relevant: number[] = [];
+
+        for (let i = 0; i < TapeId.TapeCount; i++) {
+            const cond = this.conditions[i];
+            const act = this.actions[i];
+
+            const actIsActive = !(act.write.type === 'fromTape' && act.write.sourceTape === i && act.move === Move.Stay);
+            const condIsActive = !cond.matches(TapeSymbol.Wildcard)
+
+            if (actIsActive || condIsActive) relevant.push(i);
+        }
+
+        if (relevant.length === 0) return `\\delta\\bigl(q_{\\text{${source}}}\\bigr) = \\bigl(q_{\\text{${this.target}}}\\bigr)`;
+
+        const conds = relevant
+            .map(i => this.conditions[i].toLatex(i))
+            .join(',\\,');
+
+        const acts = relevant
+            .map(i => this.actions[i].toLatex(i))
+            .join(',\\,');
+
+        const constraints: string[] = [];
+        const constraintGroups = new Map<string, string[]>();
+
+        for (const i of relevant) {
+            const cond = this.conditions[i];
+            if (!cond.matches(TapeSymbol.Wildcard) && cond.allowedSymbols.length > 1) {
+                const varName = `${TapeId[i]}`.toLowerCase();
+                const key = cond.allowedSymbols.map((s) => symbolToLatex(s)).join(', ');
+                if (!constraintGroups.has(key)) constraintGroups.set(key, []);
+                constraintGroups.get(key)!.push(varName);
+            }
+        }
+
+        for (const [domainStr, vars] of constraintGroups.entries()) {
+            constraints.push(`${vars.join('\\,')} \\in \\{${domainStr}\\}`);
+        }
+
+        const constraintSuffix = constraints.length > 0 ? `, \\quad ${constraints.join(', ')}` : '';
+
+        return `\\delta\\bigl(q_{\\text{${source}}},\\,${conds}\\bigr) = \\bigl(q_{\\text{${this.target}}},\\,${acts}\\bigr)${constraintSuffix}`;
     }
 
     toJSON() {

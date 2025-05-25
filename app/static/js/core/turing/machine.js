@@ -101,7 +101,7 @@ export class Machine {
             return this.currentInstruction;
         this.state = this.currentInstruction.target;
         if (this.state.includes("error"))
-            throw new Error(`Transitioning to error state: ${this.state}`);
+            throw new Error(`Nastaven chybový stav: ${this.state}`);
         this.currentInstruction = this.getSatisfied();
         return this.currentInstruction;
     }
@@ -112,7 +112,7 @@ export class Machine {
                 return instruction;
             }
         }
-        throw new Error(`No suitable instruction found for ${this.getLeft(this.getHeadReads())}!`);
+        throw new Error(`Nebyla nalezena vhodná instrukce pro podmínky pravidla: ${this.getLeft(this.getHeadReads())}!`);
     }
     isSatisfied(instruction) {
         for (let i = 0; i < instruction.conditions.length; i++) {
@@ -131,6 +131,8 @@ export class Machine {
         return true;
     }
     execute() {
+        if (this.state.includes('error'))
+            throw new Error(`Nastaven chybový stav: ${this.state}`);
         let headReads = this.getHeadReads();
         for (let i = 0; i < this.currentInstruction.actions.length; i++) {
             const action = this.currentInstruction.actions[i];
@@ -146,9 +148,8 @@ export class Machine {
         else if (action.write.type === 'fromTape') {
             symbolToWrite = symbols[action.write.sourceTape];
         }
-        else {
+        else
             throw new Error('Unknown symbol write type.');
-        }
         tape.write(symbolToWrite);
         tape.move(action.move);
     }
@@ -209,9 +210,8 @@ export class Machine {
             else if (actions[i].write.type === 'fromTape') {
                 symbolToWrite = headReads[actions[i].write.sourceTape];
             }
-            else {
+            else
                 throw new Error('Unknown symbol write type.');
-            }
             return `${name}(${symbolToWrite}, ${actions[i].move})`;
         });
         return `(${instruction.target}, ${acts.join(", ")})`;

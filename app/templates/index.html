@@ -7,9 +7,9 @@
         <div class="card border rounded-0 mb-3">
             <div class="card-header bg-light fw-bold">Řídící jednotka</div>
             <div class="card-body d-flex align-items-center ">
-                <div class="fw-bold me-3" style="width: 30px;" id="ram-ip">4</div>
-                <div class="flex-grow-1 bg-body-secondary border p-1" id="ram-instruction">R2 := [R5]</div>
-                <button class="btn play-btn d-flex align-items-center justify-content-center p-0">
+                <div class="fw-bold me-3 inline-scroll" style="width: 30px;" id="ram-ip">4</div>
+                <div class="flex-grow-1 bg-body-secondary border p-1 math-scroll" id="ram-instruction">R2 := [R5]</div>
+                <button class="btn play-btn d-flex align-items-center justify-content-center p-0" id="ram-step-button">
                     <span class="play-icon"></span>
                 </button>
             </div>
@@ -35,6 +35,7 @@
             <div class="card-header bg-light fw-bold text-start border-bottom border-top">Hlavní paměť</div>
             <div class="card-body">
                 <div class="d-flex text-center" id="ram-memory-m">
+                    <button class="scroll-btn left" id="ram-memory-m-left"></button>
                     <div class="flex-fill border p-1 d-flex flex-column memory-item">
                         <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">0</div>
                         <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
@@ -67,6 +68,7 @@
                         <div class="fw-bold border-bottom flex-grow-1 pb-1 pt-1 memory-item-address">7</div>
                         <div class="flex-grow-1 pb-1 pt-1 memory-item-value">0</div>
                     </div>
+                    <button class="scroll-btn right" id="ram-memory-m-right"></button>
                 </div>
             </div>
 
@@ -75,33 +77,81 @@
                 <div class="d-flex align-items-center mb-2" id="ram-memory-i">
                     <div class="fw-bold me-3" style="width: 30px;">I:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="ram-memory-i-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="ram-memory-i-right"></button>
                     </div>
                 </div>
                 <div class="d-flex align-items-center" id="ram-memory-o">
                     <div class="fw-bold me-3" style="width: 30px;">O:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="ram-memory-o-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="ram-memory-o-right"></button>
                     </div>
                 </div>
             </div>
@@ -114,12 +164,15 @@
                     <div class="fw-bold mb-2">Makro RAM</div>
                     <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="ram-program-macro"></textarea>
                     <div class="mt-2">
-                        <button class="btn btn-dark-hover text-white w-100 rounded-0">Načíst</button>
+                        <button class="btn btn-dark-hover text-white w-100 rounded-0" id="load-macro-button">Načíst</button>
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-fill">
                     <div class="fw-bold mb-2">Mikro RAM</div>
                     <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="ram-program-micro"></textarea>
+                    <div class="mt-2">
+                        <button class="btn btn-dark-hover text-white w-100 rounded-0" id="load-micro-button">Načíst</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -129,9 +182,8 @@
         <div class="card border rounded-0 mb-3">
             <div class="card-header bg-light fw-bold">Řídící jednotka</div>
             <div class="card-body d-flex align-items-center ">
-                <div class="fw-bold me-3" style="width: 30px;" id="turing-state">q7</div>
-                <div class="flex-grow-1 bg-body-secondary border p-1" id="turing-instruction">δ(q7, 1) = (q9, 0, →)</div>
-                <button class="btn play-btn d-flex align-items-center justify-content-center p-0">
+                <div class="flex-grow-1 bg-body-secondary border p-1 math-scroll" id="turing-instruction">δ(q7, 1) = (q9, 0, →)</div>
+                <button class="btn play-btn d-flex align-items-center justify-content-center p-0" id="turing-step-button">
                     <span class="play-icon"></span>
                 </button>
             </div>
@@ -143,66 +195,162 @@
                 <div class="d-flex align-items-center mb-2" id="turing-memory-a">
                     <div class="fw-bold me-3" style="width: 30px;">A:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="turing-memory-a-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="turing-memory-a-right"></button>
                     </div>
                 </div>
                 <div class="d-flex align-items-center mb-2" id="turing-memory-b">
                     <div class="fw-bold me-3" style="width: 30px;">B:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="turing-memory-b-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="turing-memory-b-right"></button>
                     </div>
                 </div>
                 <div class="d-flex align-items-center mb-2" id="turing-memory-c">
                     <div class="fw-bold me-3" style="width: 30px;">C:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="turing-memory-c-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="turing-memory-c-right"></button>
                     </div>
                 </div>
 
                 <div class="d-flex align-items-center" id="turing-memory-t">
                     <div class="fw-bold me-3" style="width: 30px;">T:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="turing-memory-t-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="turing-memory-t-right"></button>
                     </div>
                 </div>
             </div>
@@ -212,17 +360,41 @@
                 <div class="d-flex align-items-center" id="turing-memory-m">
                     <div class="fw-bold me-3" style="width: 30px;">M:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="turing-memory-m-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="turing-memory-m-right"></button>
                     </div>
                 </div>
             </div>
@@ -232,33 +404,81 @@
                 <div class="d-flex align-items-center mb-2" id="turing-memory-i">
                     <div class="fw-bold me-3" style="width: 30px;">I:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="turing-memory-i-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="turing-memory-i-right"></button>
                     </div>
                 </div>
                 <div class="d-flex align-items-center" id="turing-memory-o">
                     <div class="fw-bold me-3" style="width: 30px;">O:</div>
                     <div class="d-flex flex-grow-1 text-center tape-contents">
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
-                        <div class="flex-fill border p-1 tape-item">□</div>
+                        <button class="scroll-btn left" id="turing-memory-o-left"></button>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <div class="flex-fill border p-1 tape-cell">
+                            <div class="tape-item">□</div>
+                        </div>
+                        <button class="scroll-btn right" id="turing-memory-o-right"></button>
                     </div>
                 </div>
             </div>

@@ -8,30 +8,30 @@ export function safeNumberOperation(operation, ...args) {
 export function safeAdd(a, b) {
     const result = safeNumberOperation((x, y) => x + y, a, b);
     if (result === undefined) {
-        throw new Error(`Integer overflow: ${a} + ${b}`);
+        throw new Error(`Došlo k přetečení Javascript typu 'number' při operaci: ${a} + ${b}`);
     }
     return result;
 }
 export function safeSub(a, b) {
     const result = safeNumberOperation((x, y) => x - y, a, b);
     if (result === undefined) {
-        throw new Error(`Integer overflow: ${a} - ${b}`);
+        throw new Error(`Došlo k přetečení Javascript typu 'number' při operaci: ${a} - ${b}`);
     }
     return result;
 }
 export function safeMul(a, b) {
     const result = safeNumberOperation((x, y) => x * y, a, b);
     if (result === undefined) {
-        throw new Error(`Integer overflow: ${a} * ${b}`);
+        throw new Error(`Došlo k přetečení Javascript typu 'number' při operaci: ${a} * ${b}`);
     }
     return result;
 }
 export function safeIntDiv(a, b) {
     if (b === 0)
-        throw new Error(`Division by zero: ${a} / ${b}`);
+        throw new Error(`Dělení nulou: ${a} / ${b}`);
     const result = safeNumberOperation((x, y) => intDiv(x, y), a, b);
     if (result === undefined) {
-        throw new Error(`Integer overflow: ${a} / ${b}`);
+        throw new Error(`Došlo k přetečení Javascript typu 'number' při operaci: ${a} / ${b}`);
     }
     return result;
 }

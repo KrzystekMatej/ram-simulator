@@ -1,6 +1,6 @@
-import { Instruction, InstructionId } from './instruction';
-import { safeParseInteger } from '../../utils/parsing';
-import { prefixMethodErrors } from '../../utils/error-handling'
+import {Instruction, InstructionId} from './instruction';
+import {safeParseInteger} from '../../utils/parsing';
+import {prefixMethodErrors} from '../../utils/error-handling'
 
 export class Compiler {
 
@@ -11,14 +11,30 @@ export class Compiler {
         for (let i = 0; i < lines.length; i++) {
             const trimmed = lines[i].trim();
             if (trimmed.length === 0 || trimmed.startsWith('//')) continue;
-            const instruction = prefixMethodErrors(`Error at line ${i}: ${lines[i]}`, this.parseInstruction, this, trimmed);
+            const instruction = prefixMethodErrors(`Chyba na řádku č. ${i}: ${lines[i]} `, this.parseInstruction, this, trimmed);
             instructions.push(instruction);
         }
 
-        if (instructions[0].id !== InstructionId.Init) throw new Error('Missing init instruction at the start');
+        if (instructions.length === 0)
+            throw new Error('Vložený program je prázdný.');
 
-        const initCount = instructions.filter(x => x.id === InstructionId.Init).length;
-        if (initCount > 1) throw new Error('Multiple init instructions');
+        if (instructions[0].id !== InstructionId.Init) {
+            instructions.unshift(new Instruction(InstructionId.Init, []));
+
+            instructions.forEach((instruction: Instruction) => {
+               if (instruction.id === InstructionId.Jump) {
+                   instruction.args[0] += 1;
+               } else if (instruction.id === InstructionId.CondJumpConstant || instruction.id === InstructionId.CondJumpRegister) {
+                   instruction.args[3] += 1;
+               }
+            });
+        }
+
+        if (instructions.filter(x => x.id === InstructionId.Init).length > 1)
+            throw new Error('Instrukce \'init\' je zadána vícekrát.');
+
+        if (instructions[instructions.length - 1].id !== InstructionId.Halt)
+            instructions.push(new Instruction(InstructionId.Halt));
 
         return instructions;
     }
@@ -29,7 +45,7 @@ export class Compiler {
                 const prefix = 'init';
                 const rest = line.slice(prefix.length).trim();
                 if (!rest.startsWith('[') || !rest.endsWith(']')) {
-                    throw new Error('Invalid init format: missing brackets');
+                    throw new Error('Neplatný formát instrukce \'init\': chybí závorky [] - seznam čísel uložený na vstupní pásku.');
                 }
 
                 const contents = rest.slice(1, -1).trim();
@@ -89,6 +105,6 @@ export class Compiler {
                 return new Instruction(InstructionId.Halt);
         }
 
-        throw new Error(`Invalid instruction`);
+        throw new Error(`Neplatná instrukce`);
     }
 }

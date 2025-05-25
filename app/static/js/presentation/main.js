@@ -1,16 +1,15 @@
-import { RamSimulator } from "../core/micro-ram/ram-simulator.js";
+import { RamTuringSimulator } from "../core/ram-turing-simulator.js";
 import { loadFileText } from "../utils/network.js";
-import { UIRamMachine } from "./ui-ram-machine.js";
-import { UITuringMachine } from "./ui-turing-machine.js";
-let ramSimulator;
-const uiRam = new UIRamMachine();
-const uiTuring = new UITuringMachine();
+import { UISimulator } from "./simulation/simulator.js";
+import { errorModal } from "./components/components.js";
+import { getErrorMessage } from "../utils/error-handling.js";
+let simulator;
 loadFileText("/static/assets/turing-sets.txt")
     .then(turingSets => {
-    ramSimulator = new RamSimulator(turingSets);
-    uiRam.update(ramSimulator.ramMachine);
-    uiTuring.update(ramSimulator.turingMachine);
+    const ramTuringSimulator = new RamTuringSimulator(turingSets, true);
+    simulator = new UISimulator(ramTuringSimulator);
+    simulator.reset();
 })
     .catch(error => {
-    console.error("Nepodařilo se načíst pravidla přechodové funkce turingova stroje:", error);
+    errorModal.show(`Nepodařilo se načíst pravidla přechodové funkce turingova stroje: ${getErrorMessage(error)}`);
 });

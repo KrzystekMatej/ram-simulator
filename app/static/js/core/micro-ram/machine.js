@@ -38,7 +38,7 @@ export class Machine {
         return this.currentInstruction;
     }
     execute() {
-        prefixFunctionErrors(`Execution error at line ${this.ip}: ${this.currentInstruction.toString()}`, () => Machine.handlers[this.currentInstruction.id].call(this, ...this.currentInstruction.args));
+        prefixFunctionErrors(`Chyba při vykonávání programu na řádku ${this.ip}: ${this.currentInstruction.toString()} - `, () => Machine.handlers[this.currentInstruction.id].call(this, ...this.currentInstruction.args));
     }
     logState() {
         console.log(`[IP: ${this.ip}]`);
@@ -142,7 +142,7 @@ Machine.handlers = [
     function read() {
         const value = this.input.read();
         if (value === undefined)
-            throw new Error("Missing input");
+            throw new Error("Selhalo čtení ze vstupní pásky.");
         this.input.move(Move.Right);
         this.A = value;
     },

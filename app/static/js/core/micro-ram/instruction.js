@@ -22,7 +22,7 @@ export class Instruction {
     toString() {
         switch (this.id) {
             case InstructionId.Init:
-                return 'init';
+                return `init [${this.args.map((n) => n.toString()).join(', ')}]`;
             case InstructionId.AssignConst:
                 return `A = ${this.args[0]}`;
             case InstructionId.AssignB:
@@ -45,6 +45,36 @@ export class Instruction {
                 return `WRITE(A)`;
             case InstructionId.Halt:
                 return "halt";
+            default:
+                throw Error(`Micro instruction with invalid id - ${this.id}.`);
+        }
+    }
+    toLatex() {
+        switch (this.id) {
+            case InstructionId.Init:
+                return `\\text{init}\\;[${this.args.map(n => n.toString()).join(',\\;')}]`;
+            case InstructionId.AssignConst:
+                return `A = ${this.args[0]}`;
+            case InstructionId.AssignB:
+                return `B = A`;
+            case InstructionId.AssignC:
+                return `C = A`;
+            case InstructionId.Load:
+                return `A = [A]`;
+            case InstructionId.Store:
+                return `[C] = A`;
+            case InstructionId.Arithmetic:
+                return `A = A\\;${this.args[0]}\\;B`;
+            case InstructionId.Jump:
+                return `\\textbf{goto}\\;${this.args[0]}`;
+            case InstructionId.CondJump:
+                return `\\textbf{if}\\;(A\\;${this.args[0]}\\;0)\\;\\textbf{goto}\\;${this.args[1]}`;
+            case InstructionId.Read:
+                return `A = \\text{READ}()`;
+            case InstructionId.Write:
+                return `\\text{WRITE}(A)`;
+            case InstructionId.Halt:
+                return `\\textbf{halt}`;
             default:
                 throw Error(`Micro instruction with invalid id - ${this.id}.`);
         }

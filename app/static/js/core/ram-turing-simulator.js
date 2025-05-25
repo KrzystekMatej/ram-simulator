@@ -1,12 +1,12 @@
-import { InstructionId as RamInstructionId } from "../../core/micro-ram/instruction.js";
-import { Machine as RamMachine } from "../../core/micro-ram/machine.js";
-import { ToTuringTranspiler as RamToTuringTranspiler } from "../../core/micro-ram/to-turing-transpiler.js";
-import { Machine as TuringMachine } from "../../core/turing/machine.js";
-import { TapeId } from "../turing/tape-id.js";
-import { arraysEqual, mapsEqual } from '../../utils/collections.js';
-import { prefixMethodErrors } from '../../utils/error-handling.js';
-import { logSeparator } from '../../utils/logging.js';
-export class RamSimulator {
+import { InstructionId as RamInstructionId } from "./micro-ram/instruction.js";
+import { Machine as RamMachine } from "./micro-ram/machine.js";
+import { ToTuringTranspiler as RamToTuringTranspiler } from "./micro-ram/to-turing-transpiler.js";
+import { Machine as TuringMachine } from "./turing/machine.js";
+import { TapeId } from "./turing/tape-id.js";
+import { arraysEqual, mapsEqual } from '../utils/collections.js';
+import { prefixMethodErrors } from '../utils/error-handling.js';
+import { logSeparator } from '../utils/logging.js';
+export class RamTuringSimulator {
     constructor(turingSets, checkConsistency = false, verbose = false) {
         this.ramMachine = new RamMachine();
         this.transpiler = new RamToTuringTranspiler();
@@ -14,7 +14,7 @@ export class RamSimulator {
         this.initialized = false;
         this.checkConsistency = false;
         this.verbose = false;
-        prefixMethodErrors("RAM to turing transpiler error: ", this.transpiler.initialize, this.transpiler, turingSets);
+        prefixMethodErrors("Chyba RAM-Turing transpilátoru: ", this.transpiler.initialize, this.transpiler, turingSets);
         this.checkConsistency = checkConsistency;
         this.verbose = verbose;
     }
@@ -25,30 +25,34 @@ export class RamSimulator {
     }
     ramStep(executeTuring = true) {
         if (!this.initialized)
-            throw new Error("Simulation error: Uninitialized!");
-        prefixMethodErrors("RAM machine error: ", this.ramMachine.execute, this.ramMachine);
+            throw new Error("Simulace není inicializována je nutno načíst program.");
+        if (this.isFinished())
+            throw new Error("Program byl již ukončen - nelze pokračovat.");
+        prefixMethodErrors("Chyba stroje RAM: ", this.ramMachine.execute, this.ramMachine);
         if (executeTuring)
-            prefixMethodErrors("Turing machine error: ", this.turingMachine.executeProgram, this.turingMachine);
-        const instruction = prefixMethodErrors("RAM machine error: ", this.ramMachine.next, this.ramMachine);
+            prefixMethodErrors("Chyba turingova stroje: ", this.turingMachine.executeProgram, this.turingMachine);
+        const instruction = prefixMethodErrors("Chyba stroje RAM: ", this.ramMachine.next, this.ramMachine);
         if (this.verbose) {
             console.log("Micro ram instruction");
             console.log(instruction.toString());
         }
         this.turingMachine.setProgram(this.transpiler.transpile(instruction, this.ramMachine.ip));
-        prefixMethodErrors("Turing machine error: ", this.turingMachine.next, this.turingMachine);
+        prefixMethodErrors("Chyba turingova stroje: ", this.turingMachine.next, this.turingMachine);
         if (this.checkConsistency && !this.areMachineStatesConsistent())
-            throw new Error(`Simulation error: Machine states are not consistent after instruction ${this.ramMachine.ip}: ${instruction.toString()}`);
+            throw new Error(`Chyba simulace: stavy strojů nejsou konzistentní po uskutečnění instrukce č. ${this.ramMachine.ip}: ${instruction.toString()}`);
         return instruction;
     }
     turingStep() {
         if (!this.initialized)
-            throw new Error("Simulation error: Uninitialized!");
-        prefixMethodErrors("Turing machine error: ", this.turingMachine.execute, this.turingMachine);
+            throw new Error("Simulace není inicializována je nutno načíst program.");
+        if (this.isFinished())
+            throw new Error("Program byl již ukončen - nelze pokračovat.");
+        prefixMethodErrors("Chyba turingova stroje: ", this.turingMachine.execute, this.turingMachine);
         if (this.turingMachine.currentInstruction.target.includes("start")) {
             this.ramStep(false);
             return this.turingMachine.currentInstruction;
         }
-        return prefixMethodErrors("Turing machine error: ", this.turingMachine.next, this.turingMachine);
+        return prefixMethodErrors("Chyba turingova stroje: ", this.turingMachine.next, this.turingMachine);
     }
     areMachineStatesConsistent() {
         return (this.turingMachine.state === `${this.ramMachine.ip}_start` || (this.turingMachine.state.includes("halt") && this.ramMachine.currentInstruction.id === RamInstructionId.Halt)) &&
@@ -61,7 +65,7 @@ export class RamSimulator {
     }
     executeAllRam() {
         if (!this.initialized)
-            throw new Error("Simulation error: Uninitialized!");
+            throw new Error("Simulace není inicializována je nutno načíst program.");
         while (true) {
             const instruction = this.ramStep();
             if (instruction.id === RamInstructionId.Halt || this.ramMachine.ip >= this.ramMachine.program.length) {
@@ -72,7 +76,7 @@ export class RamSimulator {
     }
     executeAllTuring() {
         if (!this.initialized)
-            throw new Error("Simulation error: Uninitialized!");
+            throw new Error("Simulace není inicializována je nutno načíst program.");
         while (true) {
             const instruction = this.turingStep();
             if (this.verbose) {
@@ -88,5 +92,15 @@ export class RamSimulator {
                 return;
             }
         }
+    }
+    reset() {
+        this.ramMachine.reset();
+        this.turingMachine.reset();
+        this.initialized = false;
+    }
+    isFinished() {
+        return this.turingMachine.state.includes('halt')
+            || this.ramMachine.ip >= this.ramMachine.program.length
+            || this.ramMachine.currentInstruction.id === RamInstructionId.Halt;
     }
 }
