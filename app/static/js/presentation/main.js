@@ -1,7 +1,7 @@
 import { RamTuringSimulator } from "../core/ram-turing-simulator.js";
 import { loadFileText } from "../utils/network.js";
 import { UISimulator } from "./simulation/simulator.js";
-import { errorModal } from "./components/components.js";
+import { errorModal } from "./components/global-components.js";
 import { getErrorMessage } from "../utils/error-handling.js";
 let simulator;
 loadFileText("/static/assets/turing-sets.txt")
@@ -11,5 +11,5 @@ loadFileText("/static/assets/turing-sets.txt")
     simulator.reset();
 })
     .catch(error => {
-    errorModal.show(`Nepodařilo se načíst pravidla přechodové funkce turingova stroje: ${getErrorMessage(error)}`);
+    errorModal.show(`Během inicializace simulátoru došlo k chybě: ${getErrorMessage(error)}`);
 });

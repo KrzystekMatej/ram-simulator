@@ -25,7 +25,7 @@ export class RamTuringSimulator {
     }
     ramStep(executeTuring = true) {
         if (!this.initialized)
-            throw new Error("Simulace není inicializována je nutno načíst program.");
+            throw new Error("Stroje nejsou inicializovány je nutno vložit program.");
         if (this.isFinished())
             throw new Error("Program byl již ukončen - nelze pokračovat.");
         prefixMethodErrors("Chyba stroje RAM: ", this.ramMachine.execute, this.ramMachine);
@@ -44,7 +44,7 @@ export class RamTuringSimulator {
     }
     turingStep() {
         if (!this.initialized)
-            throw new Error("Simulace není inicializována je nutno načíst program.");
+            throw new Error("Stroje nejsou inicializovány je nutno vložit program");
         if (this.isFinished())
             throw new Error("Program byl již ukončen - nelze pokračovat.");
         prefixMethodErrors("Chyba turingova stroje: ", this.turingMachine.execute, this.turingMachine);
@@ -65,7 +65,7 @@ export class RamTuringSimulator {
     }
     executeAllRam() {
         if (!this.initialized)
-            throw new Error("Simulace není inicializována je nutno načíst program.");
+            throw new Error("Stroje nejsou inicializovány je nutno vložit program");
         while (true) {
             const instruction = this.ramStep();
             if (instruction.id === RamInstructionId.Halt || this.ramMachine.ip >= this.ramMachine.program.length) {
@@ -76,7 +76,7 @@ export class RamTuringSimulator {
     }
     executeAllTuring() {
         if (!this.initialized)
-            throw new Error("Simulace není inicializována je nutno načíst program.");
+            throw new Error("Stroje nejsou inicializovány je nutno vložit program");
         while (true) {
             const instruction = this.turingStep();
             if (this.verbose) {

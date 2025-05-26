@@ -1,3 +1,4 @@
+import { HoldScrollButton } from "../../components/hold-scroll-button";
 
 export class UIRamMemory {
     startOffset: number;
@@ -8,19 +9,22 @@ export class UIRamMemory {
     constructor(source: Map<number, number>, elementId: string) {
         this.source = source;
         this.memoryElement = document.getElementById(elementId) as HTMLElement;
-
-        this.memoryElement.querySelector<HTMLButtonElement>('.scroll-btn.left')?.addEventListener('click', () => {
-            if (this.startOffset > 0) return;
-            this.startOffset += 1;
-            this.update();
-        });
-
-        this.memoryElement.querySelector<HTMLButtonElement>('.scroll-btn.right')?.addEventListener('click', () => {
-            this.startOffset -= 1;
-            this.update();
-        });
-
         this.startOffset = 0;
+
+        new HoldScrollButton(this.memoryElement.querySelector<HTMLButtonElement>('.scroll-btn.left')!,
+            () => {
+                if (this.startOffset >= 0) return;
+                this.startOffset += 1;
+                this.update();
+            }, 200, 70
+        );
+
+        new HoldScrollButton(this.memoryElement.querySelector<HTMLButtonElement>('.scroll-btn.right')!,
+            () => {
+                this.startOffset -= 1;
+                this.update();
+            }, 200, 70
+        );
     }
 
     update() : void {
@@ -42,7 +46,7 @@ export class UIRamMemory {
             });
 
         items.forEach((item, i) => {
-           const address = this.startOffset + i;
+           const address = i - this.startOffset;
            const value = this.source.get(address);
            item.address.textContent = address.toString();
            item.value.textContent = value === undefined ? '0' : value.toString();

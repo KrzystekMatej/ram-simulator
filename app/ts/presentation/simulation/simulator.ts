@@ -2,33 +2,31 @@ import {RamTuringSimulator} from "../../core/ram-turing-simulator";
 import {UITuringMachine} from "./turing-machine";
 import {UIRamMachine} from "./ram-machine";
 import { getErrorMessage } from "../../utils/error-handling";
-import { errorModal } from "../components/components";
+import { errorModal } from "../components/global-components";
+import {HoldScrollButton} from "../components/hold-scroll-button";
+import {loadProgramModal} from "../components/global-components";
 
 export class UISimulator {
     readonly simulator: RamTuringSimulator;
     readonly ramMachine: UIRamMachine;
     readonly turingMachine: UITuringMachine;
 
-    readonly ramStepButton: HTMLElement;
-    readonly turingStepButton: HTMLElement;
-
-    readonly loadMacroButton: HTMLElement;
-    readonly loadMicroButton: HTMLElement;
-
     constructor(simulator: RamTuringSimulator) {
         this.simulator = simulator;
         this.ramMachine = new UIRamMachine(simulator.ramMachine);
         this.turingMachine = new UITuringMachine(simulator.turingMachine);
 
-        this.ramStepButton = document.getElementById('ram-step-button') as HTMLElement;
-        this.turingStepButton = document.getElementById('turing-step-button') as HTMLElement;
-        this.ramStepButton.addEventListener('click', () => this.ramStep());
-        this.turingStepButton.addEventListener('click', () => this.turingStep());
+        new HoldScrollButton(document.getElementById('ram-step-button')!,
+            () => this.ramStep(), 200, 120
+        );
+        new HoldScrollButton(document.getElementById('turing-step-button')!,
+            () => this.turingStep(), 200, 120
+        );
 
-        this.loadMacroButton = document.getElementById('load-macro-button') as HTMLElement;
-        this.loadMicroButton = document.getElementById('load-micro-button') as HTMLElement;
-        this.loadMacroButton.addEventListener('click', () => this.loadMacro());
-        this.loadMicroButton.addEventListener('click', () => this.loadMicro());
+        document.getElementById('compile-macro-button')!.addEventListener('click', () => this.compileMacro());
+        document.getElementById('compile-micro-button')!.addEventListener('click', () => this.compileMicro());
+        document.getElementById('load-macro-button')!.addEventListener('click', () => this.loadMacro());
+        document.getElementById('load-micro-button')!.addEventListener('click', () => this.loadMicro());
     }
 
     ramStep() {
@@ -51,7 +49,7 @@ export class UISimulator {
         }
     }
 
-    loadMacro() {
+    compileMacro() {
         try {
             const program = this.ramMachine.compileMacro();
             this.simulator.initialize(program);
@@ -62,12 +60,42 @@ export class UISimulator {
         }
     }
 
-    loadMicro() {
+    compileMicro() {
         try {
             const program = this.ramMachine.compileMicro();
             this.simulator.initialize(program);
             this.ramMachine.update();
             this.turingMachine.update();
+        } catch(e) {
+            errorModal.show(getErrorMessage(e));
+        }
+    }
+
+    loadMacro() : void {
+        try {
+            loadProgramModal.show("macro")
+                .then(programContent => {
+                    const macroTextarea = document.getElementById('ram-program-macro') as HTMLTextAreaElement;
+                    macroTextarea.value = programContent;
+                })
+                .catch(error => {
+                    console.warn("Macro program loading cancelled or failed:", error.message);
+                });
+        } catch(e) {
+            errorModal.show(getErrorMessage(e));
+        }
+    }
+
+    loadMicro(): void {
+        try {
+            loadProgramModal.show("micro")
+                .then(programContent => {
+                    const microTextarea = document.getElementById('ram-program-micro') as HTMLTextAreaElement;
+                    microTextarea.value = programContent;
+                })
+                .catch(error => {
+                    console.warn("Micro program loading cancelled or failed:", error.message);
+                });
         } catch(e) {
             errorModal.show(getErrorMessage(e));
         }

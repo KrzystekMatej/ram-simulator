@@ -1,6 +1,7 @@
 import {Tape} from "../../../core/tape/tape";
 import {intDiv} from "../../../utils/math";
 import { TapeSymbol} from "../../../core/tape/symbol";
+import {HoldScrollButton} from "../../components/hold-scroll-button";
 
 export class UISymbolTape {
     headOffset: number;
@@ -13,22 +14,26 @@ export class UISymbolTape {
         this.tapeElement = document.getElementById(elementId) as HTMLElement;
         this.headOffset = 0;
 
-        this.tapeElement.querySelector<HTMLButtonElement>('.scroll-btn.left')?.addEventListener('click', () => {
-            this.headOffset += 1;
-            this.update();
-        });
+        new HoldScrollButton(this.tapeElement.querySelector<HTMLButtonElement>('.scroll-btn.left')!,
+            () => {
+                this.headOffset += 1;
+                this.update();
+            }, 200, 70
+        );
 
-        this.tapeElement.querySelector<HTMLButtonElement>('.scroll-btn.right')?.addEventListener('click', () => {
-            this.headOffset -= 1;
-            this.update();
-        });
+        new HoldScrollButton(this.tapeElement.querySelector<HTMLButtonElement>('.scroll-btn.right')!,
+            () => {
+                this.headOffset -= 1;
+                this.update();
+            }, 200, 70
+        );
     }
 
     update() : void {
         const items = this.tapeElement.querySelectorAll<HTMLElement>('.tape-item');
 
         const middleElementPos = intDiv(items.length, 2);
-        const tapeContents = this.source.getSegments(this.headOffset + this.source.tell(), middleElementPos, items.length - middleElementPos - 1);
+        const tapeContents = this.source.getSegments(this.source.tell() - this.headOffset, middleElementPos, items.length - middleElementPos - 1);
 
         const headElementPos = middleElementPos + this.headOffset;
 
