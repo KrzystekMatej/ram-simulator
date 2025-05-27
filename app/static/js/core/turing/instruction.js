@@ -258,19 +258,76 @@ export class Instruction {
         const constraintSuffix = constraints.length > 0 ? `, \\quad ${constraints.join(', ')}` : '';
         return `\\delta\\bigl(q_{\\text{${source}}},\\,${conds}\\bigr) = \\bigl(q_{\\text{${this.target}}},\\,${acts}\\bigr)${constraintSuffix}`;
     }
-    toJSON() {
-        return {
-            target: this.target,
-            conditions: this.conditions.map(c => c.allowedSymbols),
-            actions: this.actions.map(a => ({
-                write: a.write,
-                move: a.move
-            }))
-        };
+    toStringTransition(state, headReads) {
+        return Instruction.getLeftString(state, headReads) + " = " + this.getRightString(headReads);
     }
-    static fromJSON(data) {
-        const conditions = data.conditions.map((symbols) => new TapeCondition(symbols));
-        const actions = data.actions.map((a) => new TapeAction(a.write, a.move));
-        return new Instruction(data.target, conditions, actions);
+    static getLeftString(state, headReads) {
+        const conds = Array.from({ length: TapeId.TapeCount }, (_, i) => {
+            const name = TapeId[i];
+            return `${name}(${headReads[i]})`;
+        });
+        return `(${state}, ${conds.join(", ")})`;
+    }
+    getRightString(headReads) {
+        let actions = this.actions;
+        const acts = Array.from({ length: TapeId.TapeCount }, (_, i) => {
+            const name = TapeId[i];
+            let symbolToWrite;
+            if (actions[i].write.type === 'literal') {
+                symbolToWrite = actions[i].write.symbol;
+            }
+            else if (actions[i].write.type === 'fromTape') {
+                symbolToWrite = headReads[actions[i].write.sourceTape];
+            }
+            else
+                throw new Error('Unknown symbol write type.');
+            return `${name}(${symbolToWrite}, ${actions[i].move})`;
+        });
+        return `(${this.target}, ${acts.join(", ")})`;
+    }
+    toLatexTransition(state, headReads) {
+        return Instruction.getLeftLatex(state, headReads) + " = " + this.getRightLatex(headReads);
+    }
+    static getLeftLatex(state, headReads) {
+        const conds = Array.from({ length: TapeId.TapeCount }, (_, i) => {
+            return `(${symbolToLatex(headReads[i])})_${TapeId[i]}`;
+        });
+        return `\\delta\\bigl(q_{\\text{${state}}},\\,${conds.join(",\\,")}\\bigr)`;
+    }
+    getRightLatex(headReads) {
+        let actions = this.actions;
+        const acts = Array.from({ length: TapeId.TapeCount }, (_, i) => {
+            let symbolToWrite;
+            if (actions[i].write.type === 'literal') {
+                symbolToWrite = symbolToLatex(actions[i].write.symbol);
+            }
+            else if (actions[i].write.type === 'fromTape') {
+                symbolToWrite = symbolToLatex(headReads[actions[i].write.sourceTape]);
+            }
+            else
+                throw new Error('Unknown symbol write type.');
+            return `(${symbolToWrite}, ${actions[i].move >= 0 ? '+' : ''}${actions[i].move})_${TapeId[i]}`;
+        });
+        return `\\bigl(q_{\\text{${this.target}}},\\,${acts.join(",\\,")}\\bigr)`;
+    }
+    *generateReadHeads() {
+        const allSymbols = Object.values(TapeSymbol);
+        const domains = this.conditions.map(cond => {
+            return cond.allowedSymbols.includes(TapeSymbol.Wildcard)
+                ? allSymbols
+                : cond.allowedSymbols;
+        });
+        function* recurse(pos, prefix) {
+            if (pos === domains.length) {
+                yield [...prefix];
+                return;
+            }
+            for (const sym of domains[pos]) {
+                prefix.push(sym);
+                yield* recurse(pos + 1, prefix);
+                prefix.pop();
+            }
+        }
+        yield* recurse(0, []);
     }
 }

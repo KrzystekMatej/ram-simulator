@@ -2,9 +2,10 @@ import {RamTuringSimulator} from "../../core/ram-turing-simulator";
 import {UITuringMachine} from "./turing-machine";
 import {UIRamMachine} from "./ram-machine";
 import { getErrorMessage } from "../../utils/error-handling";
-import { errorModal } from "../components/global-components";
+import {errorModal, turingProgramModal} from "../components/global-components";
 import {HoldScrollButton} from "../components/hold-scroll-button";
 import {loadProgramModal} from "../components/global-components";
+import {toBlockLatex, toInlineLatex} from "../../utils/latex";
 
 export class UISimulator {
     readonly simulator: RamTuringSimulator;
@@ -27,6 +28,9 @@ export class UISimulator {
         document.getElementById('compile-micro-button')!.addEventListener('click', () => this.compileMicro());
         document.getElementById('load-macro-button')!.addEventListener('click', () => this.loadMacro());
         document.getElementById('load-micro-button')!.addEventListener('click', () => this.loadMicro());
+
+        document.getElementById('show-compact-turing-program')!.addEventListener('click', () => this.showCompactTuringProgram());
+        document.getElementById('show-full-turing-program')!.addEventListener('click', () => this.showFullTuringProgram());
     }
 
     ramStep() {
@@ -99,6 +103,23 @@ export class UISimulator {
         } catch(e) {
             errorModal.show(getErrorMessage(e));
         }
+    }
+
+    showCompactTuringProgram(): void {
+        const latex = this.simulator.ramMachine.program
+            .map((ramInst, ip) =>
+                Array.from(this.simulator.transpiler.transpile(ramInst, ip).entries())
+                    .map(([state, instructions]) =>
+                        instructions.map(turingInst =>
+                            `<div>${toInlineLatex(turingInst.toLatex(state))}</div>`
+                        ).join("")
+                    ).join("")
+            ).join("");
+        turingProgramModal.show("Celá přechodová funkce programu ve zkrácené formě", latex)
+    }
+
+    showFullTuringProgram(): void {
+
     }
 
     reset() {

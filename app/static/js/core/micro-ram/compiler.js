@@ -5,11 +5,23 @@ export class Compiler {
     compile(text) {
         let instructions = [];
         const lines = text.split('\n');
+        while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+            lines.pop();
+        }
         for (let i = 0; i < lines.length; i++) {
-            const trimmed = lines[i].trim();
-            if (trimmed.length === 0 || trimmed.startsWith('//'))
-                continue;
-            const instruction = prefixMethodErrors(`Chyba na řádku č. ${i}: ${lines[i]} `, this.parseInstruction, this, trimmed);
+            let originalLine = lines[i];
+            let trimmedLine = originalLine.trim();
+            while (trimmedLine.includes('#')) {
+                const start = trimmedLine.indexOf('#');
+                const end = trimmedLine.indexOf('#', start + 1);
+                if (end === -1)
+                    throw new Error(`Neuzavřený komentář na řádku č. ${i}`);
+                trimmedLine = trimmedLine.slice(0, start) + trimmedLine.slice(end + 1);
+            }
+            trimmedLine = trimmedLine.trim();
+            if (trimmedLine === '')
+                throw new Error(`Prázdná instrukce na řádku č. ${i}`);
+            const instruction = prefixMethodErrors(`Chyba na řádku č. ${i}: ${originalLine} `, this.parseInstruction, this, trimmedLine);
             instructions.push(instruction);
         }
         if (instructions.length === 0)

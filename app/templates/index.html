@@ -7,7 +7,7 @@
         <div class="card border rounded-0 mb-3">
             <div class="card-header bg-light fw-bold">Řídící jednotka</div>
             <div class="card-body d-flex align-items-center ">
-                <div class="fw-bold me-3 inline-scroll" style="width: 30px;" id="ram-ip">4</div>
+                <div class="fw-bold me-3 inline-scroll" style="width: 70px;" id="ram-ip">IP: 4</div>
                 <div class="flex-grow-1 bg-body-secondary border p-1 math-scroll" id="ram-instruction">R2 := [R5]</div>
                 <button class="btn play-btn d-flex align-items-center justify-content-center p-0" id="ram-step-button">
                     <span class="play-icon"></span>
@@ -161,7 +161,7 @@
             <div class="card-header bg-light fw-bold">Program</div>
             <div class="card-body d-flex gap-3 flex-grow-1" id="ram-programs">
                 <div class="d-flex flex-column flex-fill">
-                <div class="fw-bold mb-2">Makro RAM</div>
+                    <div class="fw-bold mb-2">Makro RAM</div>
                     <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="ram-program-macro"></textarea>
                     <div class="mt-2 row gx-2">
                         <div class="col">
@@ -191,11 +191,20 @@
         <h2 class="text-center">Turingův stroj</h2>
         <div class="card border rounded-0 mb-3">
             <div class="card-header bg-light fw-bold">Řídící jednotka</div>
-            <div class="card-body d-flex align-items-center ">
-                <div class="flex-grow-1 bg-body-secondary border p-1 math-scroll" id="turing-instruction">δ(q7, 1) = (q9, 0, →)</div>
-                <button class="btn play-btn d-flex align-items-center justify-content-center p-0" id="turing-step-button">
-                    <span class="play-icon"></span>
-                </button>
+            <div class="card-body d-flex flex-column gap-2">
+                <div class="d-flex align-items-center">
+                    <div class="fw-bold me-3 inline-scroll" style="width: 70px;" id="turing-instruction-label">Pravidlo:</div>
+                    <div class="flex-grow-1 bg-body-secondary border p-1 math-scroll" id="turing-instruction"></div>
+                    <button class="btn play-btn d-flex align-items-center justify-content-center p-0"
+                            id="turing-step-button">
+                        <span class="play-icon"></span>
+                    </button>
+                </div>
+                <div class="d-flex flex-column">
+                    <div class="fw-bold mb-1" id="turing-transition-label">Konkrétní očekávaný přechod:</div>
+                    <div class="bg-body-secondary border p-1 math-scroll" id="turing-transition"
+                         style="min-height: 2rem;"></div>
+                </div>
             </div>
         </div>
 
@@ -495,9 +504,24 @@
         </div>
 
         <div class="card border rounded-0 mb-3 flex-grow-1 d-flex flex-column">
-            <div class="card-header bg-light fw-bold">Přechodová funkce</div>
-            <div class="card-body d-flex flex-column flex-grow-1">
-                <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="turing-program"></textarea>
+            <div class="card-header bg-light fw-bold">Přechodová funkce vykonávané RAM instrukce</div>
+            <div class="card-body d-flex flex-column flex-grow-1" id="turing-program-container">
+                <div class="flex-grow-1 rounded-0 border p-2 bg-white" id="turing-program"
+                     style="min-height: 10em; overflow-y: auto; white-space: pre-wrap; max-height: 20em;">
+                </div>
+
+                <div class="mt-2 row gx-2">
+                    <div class="col">
+                        <button class="btn btn-dark-hover text-white w-100 rounded-0" id="show-compact-turing-program">
+                            Zobrazit program ve zkráceném zápise
+                        </button>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-dark-hover text-white w-100 rounded-0" id="show-full-turing-program">
+                            Zobrazit program v plném zápise
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

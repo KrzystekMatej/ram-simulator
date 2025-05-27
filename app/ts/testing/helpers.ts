@@ -2,6 +2,11 @@ import { Faker } from '@faker-js/faker';
 import {RamTuringSimulator as SimulationTester} from "../core/ram-turing-simulator";
 import { intDiv } from "../utils/math";
 import {Instruction as MicroInstruction, InstructionId as MicroInstructionId} from "../core/micro-ram/instruction";
+import fs   from 'fs';
+import path from 'path';
+import {Compiler as MacroCompiler} from "../core/macro-ram/compiler";
+import {Compiler as MicroCompiler} from "../core/micro-ram/compiler";
+import {ToMicroTranspiler} from "../core/macro-ram/to-micro-transpiler";
 
 export function prepareTestNumbers(): number[] {
     let testNumbers: number[] = [
@@ -97,4 +102,29 @@ export function testArithmetic(simulationTester: SimulationTester, operator: str
             throw new Error(`Simulation failed at input ${a} ${operator} ${b} = ${result}: ${e}`);
         }
     });
+}
+
+export function readProgramFromFile(programType: string, programName: string): MicroInstruction[] {
+    const filePath = path.resolve(__dirname, `../../static/assets/programs/${programType}/${programName}.ram`);
+    const text = fs.readFileSync(filePath, 'utf-8');
+
+    if (programType === "macro") {
+        const macroCompiler: MacroCompiler = new MacroCompiler();
+        const transpiler: ToMicroTranspiler = new ToMicroTranspiler();
+        return transpiler.transpile(macroCompiler.compile(text))[0];
+    } else if (programType === "micro") {
+        const microCompiler: MicroCompiler = new MicroCompiler();
+        return microCompiler.compile(text);
+    } else throw new Error("Non existing type of program!");
+}
+
+export function factorial(n: number): number {
+    if (n < 0) {
+        throw new Error("Faktoriál není definován pro záporná čísla.");
+    }
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+        result *= i;
+    }
+    return result;
 }

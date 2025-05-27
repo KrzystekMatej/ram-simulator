@@ -1,5 +1,5 @@
 import { LinearTape } from '../tape/linear';
-import { TapeSymbol } from '../tape/symbol';
+import {symbolToLatex, TapeSymbol} from '../tape/symbol';
 import { Tape } from '../tape/tape';
 import { TapeAction, Instruction, Instruction as TuringInstruction } from './instruction';
 import { TapeId } from './tape-id';
@@ -126,7 +126,7 @@ export class Machine {
             }
         }
 
-        throw new Error(`Nebyla nalezena vhodná instrukce pro podmínky pravidla: ${this.getLeft(this.getHeadReads())}!`);
+        throw new Error(`Nebyla nalezena vhodná instrukce pro podmínky pravidla: ${Instruction.getLeftString(this.state, this.getHeadReads())}!`);
     }
 
     isSatisfied(instruction: Instruction): boolean {
@@ -202,7 +202,7 @@ export class Machine {
         console.log("General instruction:");
         console.log(instruction.toString(this.state));
         console.log("Concrete transition:");
-        console.log(this.getTransitionString(instruction, headReads));
+        console.log(instruction.toStringTransition(this.state, headReads));
         logSeparator();
     }
 
@@ -217,34 +217,5 @@ export class Machine {
             console.log(`${name} = (contents: ${this.formatTapeContents(i, 10, 10)}, head: ${tape.tell()})`);
         }
         logSeparator();
-    }
-
-    getTransitionString(instruction: Instruction, headReads: TapeSymbol[]): string {
-        return this.getLeft(headReads) + " = " + this.getRight(instruction, headReads);
-    }
-
-    getLeft(headReads: TapeSymbol[]): string {
-        const conds = Array.from({ length: TapeId.TapeCount }, (_, i) => {
-            const name = TapeId[i];
-            return `${name}(${headReads[i]})`;
-        });
-        return `(${this.state}, ${conds.join(", ")})`;
-    }
-
-    getRight(instruction: Instruction, headReads: TapeSymbol[]): string {
-        let actions: TapeAction[] = instruction.actions;
-
-        const acts = Array.from({ length: TapeId.TapeCount }, (_, i) => {
-            const name = TapeId[i];
-            let symbolToWrite: TapeSymbol;
-            if (actions[i].write.type === 'literal') {
-                symbolToWrite = actions[i].write.symbol;
-            } else if (actions[i].write.type === 'fromTape') {
-                symbolToWrite = headReads[actions[i].write.sourceTape];
-            } else throw new Error('Unknown symbol write type.');
-
-            return `${name}(${symbolToWrite}, ${actions[i].move})`;
-        });
-        return `(${instruction.target}, ${acts.join(", ")})`;
     }
 }

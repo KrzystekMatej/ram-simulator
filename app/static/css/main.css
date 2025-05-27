@@ -118,10 +118,9 @@
 .memory-item-value::-webkit-scrollbar{height:4px;}
 
 
-/* společné parametry (stejná výška jako buňka pásky = 2.5 rem) */
 .scroll-btn{
-    width: 1.75rem;           /* úzké, ať nepřekáží */
-    height: 2.5rem;           /* = .tape-cell/.memory-item height  */
+    width: 1.75rem;
+    height: 2.5rem;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -135,25 +134,21 @@
 }
 .scroll-btn:hover{background:#343a40}
 
-/* samotná šipka – dědí směr z modifikátoru .left / .right */
 .scroll-btn::before{
     content:"";
     display:block;
     width:0; height:0;
     border-top:8px solid transparent;
     border-bottom:8px solid transparent;
-    border-left:12px solid #fff; /* default = ► */
-    /* zarovnání na střed */
+    border-left:12px solid #fff;
     margin-left:2px;
 }
 
-/* levé tlačítko – stejná šipka, jen otočíme o 180 ° */
 .scroll-btn.left::before{
-    transform:rotate(180deg);   /* ⇦ */
-    margin-left:0;              /* aby byla opět vycentrovaná */
+    transform:rotate(180deg);
+    margin-left:0;
 }
 
-/* pravé lze buď nechat default ( ► ), nebo přidat .right pro čitelnost */
 .scroll-btn.right::before{
-    /* žádná změna, jen semantický háček */
 }
+

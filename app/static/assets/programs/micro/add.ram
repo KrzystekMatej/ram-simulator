@@ -1,0 +1,6 @@
+init [125, 307]
+A = READ()
+B = A
+A = READ()
+A = A + B
+WRITE(A)

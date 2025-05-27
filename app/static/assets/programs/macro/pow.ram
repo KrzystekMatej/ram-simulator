@@ -1,0 +1,10 @@
+init [7, 3]
+R1 = READ()
+R2 = READ()
+R3 = 1
+#loop:# if (R2 == 0) goto 8 #end#
+R3 = R3 * R1
+R2 = R2 - 1
+goto 4 #loop#
+#end:# WRITE(R3)
+halt

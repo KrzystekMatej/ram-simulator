@@ -94,7 +94,7 @@ export class ToTuringTranspiler {
                 TuringInstruction.createFromOrderedEntries(
                     'left_shift_a',
                      [cond(TapeId.A, TapeSymbol.Zero, TapeSymbol.One)],
-                      [tapeAct(TapeId.A, TapeId.A, Move.Left)]
+                      [tapeAct(TapeId.A, TapeId.A, Move.Right)]
                 ),
                 TuringInstruction.createFromOrderedEntries(
                     'write_0',

@@ -112,7 +112,7 @@ export class Machine {
                 return instruction;
             }
         }
-        throw new Error(`Nebyla nalezena vhodná instrukce pro podmínky pravidla: ${this.getLeft(this.getHeadReads())}!`);
+        throw new Error(`Nebyla nalezena vhodná instrukce pro podmínky pravidla: ${Instruction.getLeftString(this.state, this.getHeadReads())}!`);
     }
     isSatisfied(instruction) {
         for (let i = 0; i < instruction.conditions.length; i++) {
@@ -175,7 +175,7 @@ export class Machine {
         console.log("General instruction:");
         console.log(instruction.toString(this.state));
         console.log("Concrete transition:");
-        console.log(this.getTransitionString(instruction, headReads));
+        console.log(instruction.toStringTransition(this.state, headReads));
         logSeparator();
     }
     logConfiguration() {
@@ -188,32 +188,5 @@ export class Machine {
             console.log(`${name} = (contents: ${this.formatTapeContents(i, 10, 10)}, head: ${tape.tell()})`);
         }
         logSeparator();
-    }
-    getTransitionString(instruction, headReads) {
-        return this.getLeft(headReads) + " = " + this.getRight(instruction, headReads);
-    }
-    getLeft(headReads) {
-        const conds = Array.from({ length: TapeId.TapeCount }, (_, i) => {
-            const name = TapeId[i];
-            return `${name}(${headReads[i]})`;
-        });
-        return `(${this.state}, ${conds.join(", ")})`;
-    }
-    getRight(instruction, headReads) {
-        let actions = instruction.actions;
-        const acts = Array.from({ length: TapeId.TapeCount }, (_, i) => {
-            const name = TapeId[i];
-            let symbolToWrite;
-            if (actions[i].write.type === 'literal') {
-                symbolToWrite = actions[i].write.symbol;
-            }
-            else if (actions[i].write.type === 'fromTape') {
-                symbolToWrite = headReads[actions[i].write.sourceTape];
-            }
-            else
-                throw new Error('Unknown symbol write type.');
-            return `${name}(${symbolToWrite}, ${actions[i].move})`;
-        });
-        return `(${instruction.target}, ${acts.join(", ")})`;
     }
 }

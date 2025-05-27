@@ -4,6 +4,7 @@ export class UITuringMachine {
     constructor(sourceMachine) {
         this.sourceMachine = sourceMachine;
         this.currentInstruction = document.getElementById("turing-instruction");
+        this.currentTransition = document.getElementById("turing-transition");
         this.tapes = [
             new UISymbolTape(this.sourceMachine.tapes[0], "turing-memory-a"),
             new UISymbolTape(this.sourceMachine.tapes[1], "turing-memory-b"),
@@ -19,14 +20,15 @@ export class UITuringMachine {
         if (!resetTapeOffsets)
             this.resetTapeOffsets();
         this.currentInstruction.innerHTML = toInlineLatex(this.sourceMachine.currentInstruction.toLatex(this.sourceMachine.state));
-        console.log(toInlineLatex(this.sourceMachine.currentInstruction.toLatex(this.sourceMachine.state)));
-        MathJax.typeset([this.currentInstruction]);
+        this.currentTransition.innerHTML = toInlineLatex(this.sourceMachine.currentInstruction.toLatexTransition(this.sourceMachine.state, this.sourceMachine.getHeadReads()));
         this.tapes.forEach((tape) => tape.update());
-        this.program.value = Array.from(this.sourceMachine.program)
+        this.program.innerHTML = Array.from(this.sourceMachine.program)
             .map(([state, instructions]) => instructions
             .map(instruction => toInlineLatex(instruction.toLatex(state)))
             .join("\n"))
             .join("\n");
+        MathJax.typeset([this.currentInstruction, this.currentTransition]);
+        MathJax.typesetPromise([this.program]);
     }
     resetTapeOffsets() {
         this.tapes.forEach((tape) => {

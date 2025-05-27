@@ -26,7 +26,7 @@ export class UIRamMachine {
     update(resetTapeOffsets = true) {
         if (!resetTapeOffsets)
             this.resetTapeOffsets();
-        this.ip.textContent = this.sourceMachine.ip.toString();
+        this.ip.textContent = `IP: ${this.sourceMachine.ip.toString()}`;
         this.A.textContent = this.sourceMachine.A.toString();
         this.B.textContent = this.sourceMachine.B.toString();
         this.C.textContent = this.sourceMachine.C.toString();

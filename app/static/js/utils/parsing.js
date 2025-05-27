@@ -14,7 +14,7 @@ export function IntToMinimalTwosComplement(value) {
     if (value === 0)
         return '0';
     if (!Number.isSafeInteger(value)) {
-        throw new Error(`Nepodařilo se převést číslo ${value} na řetěze - nejedná se o bezpečné číslo typu 'number' (64bit float)`);
+        throw new Error(`Nepodařilo se převést číslo ${value} na řetězce - nejedná se o bezpečné číslo typu 'number' (64bit float)`);
     }
     if (value > 0) {
         return '0' + value.toString(2);

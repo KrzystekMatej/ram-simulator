@@ -1,0 +1,15 @@
+init [5, 3, -23, 76, 12, 24]
+R0 = READ()
+R1 = 0
+if (R0 == 0) goto 13 #output#
+R1 = READ()
+R0 = R0 - 1
+#loop:# if (R0 == 0) goto 13 #output#
+R2 = READ()
+if (R2 > R1) goto 10 #setmax#
+goto 11 #next#
+#setmax:# R1 = R2
+#next:# R0 = R0 - 1
+goto 6 #loop#
+#output:# WRITE(R1)
+halt

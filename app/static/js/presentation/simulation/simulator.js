@@ -1,9 +1,10 @@
 import { UITuringMachine } from "./turing-machine.js";
 import { UIRamMachine } from "./ram-machine.js";
 import { getErrorMessage } from "../../utils/error-handling.js";
-import { errorModal } from "../components/global-components.js";
+import { errorModal, turingProgramModal } from "../components/global-components.js";
 import { HoldScrollButton } from "../components/hold-scroll-button.js";
 import { loadProgramModal } from "../components/global-components.js";
+import { toInlineLatex } from "../../utils/latex.js";
 export class UISimulator {
     constructor(simulator) {
         this.simulator = simulator;
@@ -15,6 +16,8 @@ export class UISimulator {
         document.getElementById('compile-micro-button').addEventListener('click', () => this.compileMicro());
         document.getElementById('load-macro-button').addEventListener('click', () => this.loadMacro());
         document.getElementById('load-micro-button').addEventListener('click', () => this.loadMicro());
+        document.getElementById('show-compact-turing-program').addEventListener('click', () => this.showCompactTuringProgram());
+        document.getElementById('show-full-turing-program').addEventListener('click', () => this.showFullTuringProgram());
     }
     ramStep() {
         try {
@@ -87,6 +90,14 @@ export class UISimulator {
         catch (e) {
             errorModal.show(getErrorMessage(e));
         }
+    }
+    showCompactTuringProgram() {
+        const latex = this.simulator.ramMachine.program
+            .map((ramInst, ip) => Array.from(this.simulator.transpiler.transpile(ramInst, ip).entries())
+            .map(([state, instructions]) => instructions.map(turingInst => `<div>${toInlineLatex(turingInst.toLatex(state))}</div>`).join("")).join("")).join("");
+        turingProgramModal.show("Celá přechodová funkce programu ve zkrácené formě", latex);
+    }
+    showFullTuringProgram() {
     }
     reset() {
         this.simulator.reset();

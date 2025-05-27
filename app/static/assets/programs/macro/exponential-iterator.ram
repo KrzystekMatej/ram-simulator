@@ -1,9 +1,9 @@
 init [5]
 R2 = READ()
 R1 = 2
-goto 5
+goto 6
 R1 = R1 * R1
 R2 = R2 - 1
-if (R2 > 0) goto 3
+if (R2 > 0) goto 4
 WRITE(R1)
 halt

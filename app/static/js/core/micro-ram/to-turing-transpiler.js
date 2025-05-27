@@ -138,7 +138,7 @@ ToTuringTranspiler.handlers = [
         const twosComplement = IntToMinimalTwosComplement(constant);
         turingSet.set('start', [TuringInstruction.createNop('left_shift_a')]);
         turingSet.set('left_shift_a', [
-            TuringInstruction.createFromOrderedEntries('left_shift_a', [cond(TapeId.A, TapeSymbol.Zero, TapeSymbol.One)], [tapeAct(TapeId.A, TapeId.A, Move.Left)]),
+            TuringInstruction.createFromOrderedEntries('left_shift_a', [cond(TapeId.A, TapeSymbol.Zero, TapeSymbol.One)], [tapeAct(TapeId.A, TapeId.A, Move.Right)]),
             TuringInstruction.createFromOrderedEntries('write_0', [cond(TapeId.A, TapeSymbol.End)], [litAct(TapeId.A, TapeSymbol.End, Move.Right)])
         ]);
         for (let i = 0; i < twosComplement.length; i++) {

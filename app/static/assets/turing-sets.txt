@@ -6,19 +6,19 @@ instruction: init
 
 instruction: assign_b
 
-(start) = (right_shift)
-(right_shift, A_(a)) = (right_shift, A_(a, +1)); a_(0, 1)
-(right_shift, A_($), B_(b)) = (copy, A_(a, -1), B_($, -1))
-(copy, A_(a), B_(b)) = (copy, A_(a, -1), B_(a, -1)); a_(0, 1)
-(copy, A_($), B_(b)) = (next, A_(a, +1), B_($, +1))
+(start) = (right_shift_a)
+(right_shift_a, A_(a)) = (right_shift_a, A_(a, +1)); a_(0, 1)
+(right_shift_a, A_($), B_(b)) = (copy_ab, A_(a, -1), B_($, -1))
+(copy_ab, A_(a), B_(b)) = (copy_ab, A_(a, -1), B_(a, -1)); a_(0, 1)
+(copy_ab, A_($), B_(b)) = (next, A_(a, +1), B_($, +1))
 
 instruction: assign_c
 
-(start) = (right_shift)
-(right_shift, A_(a)) = (right_shift, A_(a, +1)); a_(0, 1)
-(right_shift, A_($), C_(c)) = (copy, A_(a, -1), C_($, -1))
-(copy, A_(a), C_(c)) = (copy, A_(a, -1), C_(a, -1)); a_(0, 1)
-(copy, A_($), C_(c)) = (next, A_(a, +1), C_($, +1))
+(start) = (right_shift_a)
+(right_shift_a, A_(a)) = (right_shift_a, A_(a, +1)); a_(0, 1)
+(right_shift_a, A_($), C_(c)) = (copy_ac, A_(a, -1), C_($, -1))
+(copy_ac, A_(a), C_(c)) = (copy_ac, A_(a, -1), C_(a, -1)); a_(0, 1)
+(copy_ac, A_($), C_(c)) = (next, A_(a, +1), C_($, +1))
 
 instruction: load
 
