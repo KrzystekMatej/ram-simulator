@@ -4,44 +4,66 @@ import { prefixMethodErrors } from '../../utils/error-handling.js';
 export class Compiler {
     compile(text) {
         let instructions = [];
+        const labelMap = new Map();
         const lines = text.split('\n');
-        while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
-            lines.pop();
-        }
+        let instrIndex = 0;
         for (let i = 0; i < lines.length; i++) {
-            let originalLine = lines[i];
-            let trimmedLine = originalLine.trim();
-            while (trimmedLine.includes('#')) {
-                const start = trimmedLine.indexOf('#');
-                const end = trimmedLine.indexOf('#', start + 1);
-                if (end === -1)
-                    throw new Error(`Neuzavřený komentář na řádku č. ${i}`);
-                trimmedLine = trimmedLine.slice(0, start) + trimmedLine.slice(end + 1);
-            }
-            trimmedLine = trimmedLine.trim();
+            let trimmedLine = lines[i].trim();
+            const commentStart = trimmedLine.indexOf('//');
+            if (commentStart !== -1)
+                trimmedLine = trimmedLine.slice(0, commentStart).trim();
+            lines[i] = trimmedLine;
             if (trimmedLine === '')
-                throw new Error(`Prázdná instrukce na řádku č. ${i}`);
-            const instruction = prefixMethodErrors(`Chyba na řádku č. ${i}: ${originalLine} `, this.parseInstruction, this, trimmedLine);
+                continue;
+            if (trimmedLine.endsWith(':')) {
+                const label = trimmedLine.slice(0, -1).trim();
+                if (!label.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/))
+                    throw new Error(`Neplatný název návěstí na řádku č. ${i}`);
+                if (labelMap.has(label))
+                    throw new Error(`Duplikované návěstí '${label}' na řádku č. ${i}`);
+                labelMap.set(label, instrIndex);
+            }
+            else {
+                instrIndex++;
+            }
+        }
+        const rowMap = new Map();
+        for (let i = 0; i < lines.length; i++) {
+            const originalLine = lines[i];
+            if (originalLine === '' || originalLine.endsWith(':'))
+                continue;
+            const lineResolved = originalLine.replace(/\bgoto\s+([a-zA-Z_][a-zA-Z0-9_]*)/g, (_, label) => {
+                if (!labelMap.has(label))
+                    throw new Error(`Návěstí '${label}' není definováno`);
+                return `goto ${labelMap.get(label)}`;
+            }).replace(/\bgoto\s*\(([^)]*)\)/g, (match, inner) => match);
+            const instruction = prefixMethodErrors(`Chyba na řádku č. ${i}: ${originalLine} `, this.parseInstruction, this, lineResolved);
+            if (instruction.id === InstructionId.Jump) {
+                const target = instruction.args[0];
+                if (typeof target !== 'number' || target < 0 || target >= instrIndex) {
+                    throw new Error(`Chyba na řádku č. ${i}: ${originalLine} Skok na neplatné návěstí nebo index.`);
+                }
+            }
+            else if (instruction.id === InstructionId.CondJumpConstant || instruction.id === InstructionId.CondJumpRegister) {
+                const target = instruction.args[3];
+                if (typeof target !== 'number' || target < 0 || target >= instrIndex) {
+                    throw new Error(`Chyba na řádku č. ${i}: ${originalLine} Skok na neplatné návěstí nebo index.`);
+                }
+            }
+            rowMap.set(instructions.length, i);
             instructions.push(instruction);
         }
-        if (instructions.length === 0)
+        if (instructions.length === 0) {
             throw new Error('Vložený program je prázdný.');
+        }
         if (instructions[0].id !== InstructionId.Init) {
-            instructions.unshift(new Instruction(InstructionId.Init, []));
-            instructions.forEach((instruction) => {
-                if (instruction.id === InstructionId.Jump) {
-                    instruction.args[0] += 1;
-                }
-                else if (instruction.id === InstructionId.CondJumpConstant || instruction.id === InstructionId.CondJumpRegister) {
-                    instruction.args[3] += 1;
-                }
-            });
+            throw new Error('Program nezačíná instrukcí init.');
         }
         if (instructions.filter(x => x.id === InstructionId.Init).length > 1)
             throw new Error('Instrukce \'init\' je zadána vícekrát.');
         if (instructions[instructions.length - 1].id !== InstructionId.Halt)
             instructions.push(new Instruction(InstructionId.Halt));
-        return instructions;
+        return [instructions, rowMap];
     }
     parseInstruction(line) {
         switch (true) {

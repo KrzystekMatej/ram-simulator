@@ -1,11 +1,15 @@
 init [5, 10, 20, 30, 40, 50]
 R0 = READ()
 R1 = 0
-if (R0 == 0) goto 9 #output#
-#loop:# R2 = READ()
-R1 = R1 + R2
-R0 = R0 - 1
-if (R0 == 0) goto 9 #output#
-goto 4 #loop#
-#output:# WRITE(R1)
-halt
+if (R0 == 0) goto output
+
+loop:
+    R2 = READ()
+    R1 = R1 + R2
+    R0 = R0 - 1
+    if (R0 == 0) goto output
+    goto loop
+
+output:
+    WRITE(R1)
+    halt

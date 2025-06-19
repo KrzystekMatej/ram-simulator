@@ -73,7 +73,7 @@ export class UIRamMachine {
 
     compileMacro() : MicroInstruction[] {
         const rawProgram: string = this.program.macro.value ?? '';
-        const macroProgram = this.macroCompiler.compile(rawProgram);
+        const [macroProgram, rowMap] = this.macroCompiler.compile(rawProgram);
         this.program.macro.value = macroProgram.map((instruction) => instruction.toString()).join('\n');
         const [microProgram, _] = this.toMicroTranspiler.transpile(macroProgram);
         this.program.micro.value = microProgram.map((instruction) => instruction.toString()).join('\n');
@@ -82,7 +82,7 @@ export class UIRamMachine {
 
     compileMicro() : MicroInstruction[] {
         const rawProgram: string = this.program.micro.value ?? '';
-        const microProgram = this.microCompiler.compile(rawProgram);
+        const [microProgram, rowMap] = this.microCompiler.compile(rawProgram);
         this.program.micro.value = microProgram.map((instruction) => instruction.toString()).join('\n');
         return microProgram;
     }

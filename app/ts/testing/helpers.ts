@@ -111,10 +111,10 @@ export function readProgramFromFile(programType: string, programName: string): M
     if (programType === "macro") {
         const macroCompiler: MacroCompiler = new MacroCompiler();
         const transpiler: ToMicroTranspiler = new ToMicroTranspiler();
-        return transpiler.transpile(macroCompiler.compile(text))[0];
+        return transpiler.transpile(macroCompiler.compile(text)[0])[0];
     } else if (programType === "micro") {
         const microCompiler: MicroCompiler = new MicroCompiler();
-        return microCompiler.compile(text);
+        return microCompiler.compile(text)[0];
     } else throw new Error("Non existing type of program!");
 }
 

@@ -3,4 +3,7 @@ A = READ()
 B = A
 A = READ()
 A = A - B
-WRITE(A)
+goto los
+
+los:
+    WRITE(A)

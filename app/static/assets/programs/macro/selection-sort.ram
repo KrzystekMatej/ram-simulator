@@ -1,0 +1,54 @@
+init [5, 17, 6, -23, 134, 12]
+R0 = READ()                 //const length
+if (R0 <= 0) goto end
+R1 = 10                     //const array start pointer
+R2 = R1 + R0                //const array end pointer
+R3 = R1                     //var item pointer
+
+input_loop:
+    R4 = READ()                 //temp input value
+    [R3] = R3
+    R3 = R3 + 1
+    if (R3 < R2) goto input_loop
+    goto prepare_sort
+
+
+prepare_sort:
+    R3 = R1                     //inner index
+    goto outer_loop_cond:
+
+outer_loop_cond:
+    if (R3 < R2) goto outer_loop_start
+    goto end
+
+outer_loop_start:
+    R4 = R3 + 1
+    goto inner_loop_cond
+
+outer_loop_end:
+    R5 = [R3]
+    WRITE(R5)
+    R3 = R3 + 1
+    goto outer_loop_cond
+
+inner_loop_cond:
+    if (R4 < R2) goto inner_loop_start
+    goto outer_loop_end
+
+inner_loop_start:
+    R5 = [R3]
+    R6 = [R4]
+    if (R6 < R5) goto swap
+    goto inner_loop_end
+
+inner_loop_end:
+    R4 = R4 + 1
+    goto inner_loop_cond
+
+swap:
+    [R3] = R6
+    [R4] = R5
+    goto inner_loop_end
+
+end:
+    halt

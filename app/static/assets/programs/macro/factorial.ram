@@ -1,9 +1,13 @@
 init [5]
 R1 = READ()
 R2 = 1
-#loop:# if (R1 == 0) goto 7 #end:#
-R2 = R2 * R1
-R1 = R1 - 1
-goto 3 #loop:#
-#end:# WRITE(R2)
-halt
+
+loop:
+    if (R1 == 0) goto end
+    R2 = R2 * R1
+    R1 = R1 - 1
+    goto loop
+
+end:
+    WRITE(R2)
+    halt
