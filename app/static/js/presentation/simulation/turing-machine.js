@@ -1,5 +1,6 @@
 import { UISymbolTape } from "./memory/symbol-tape.js";
 import { toInlineLatex } from "../../utils/latex.js";
+import { UIProgram } from "./program.js";
 export class UITuringMachine {
     constructor(sourceMachine) {
         this.sourceMachine = sourceMachine;
@@ -14,21 +15,27 @@ export class UITuringMachine {
             new UISymbolTape(this.sourceMachine.tapes[5], "turing-memory-i"),
             new UISymbolTape(this.sourceMachine.tapes[6], "turing-memory-o")
         ];
-        this.program = document.getElementById("turing-program");
+        this.program = new UIProgram("turing-program");
     }
     update(resetTapeOffsets = true) {
         if (!resetTapeOffsets)
             this.resetTapeOffsets();
         this.currentInstruction.innerHTML = toInlineLatex(this.sourceMachine.currentInstruction.toLatex(this.sourceMachine.state));
         this.currentTransition.innerHTML = toInlineLatex(this.sourceMachine.currentInstruction.toLatexTransition(this.sourceMachine.state, this.sourceMachine.getHeadReads()));
-        this.tapes.forEach((tape) => tape.update());
-        this.program.innerHTML = Array.from(this.sourceMachine.program)
-            .map(([state, instructions]) => instructions
-            .map(instruction => toInlineLatex(instruction.toLatex(state)))
-            .join("\n"))
-            .join("\n");
         MathJax.typeset([this.currentInstruction, this.currentTransition]);
-        MathJax.typesetPromise([this.program]);
+        this.tapes.forEach((tape) => tape.update());
+        this.program.setTuringProgram(this.sourceMachine.program);
+        let programEntries = Array.from(this.sourceMachine.program.entries());
+        let offset = 0;
+        for (let i = 0; i < programEntries.length; ++i) {
+            const [state, instructions] = programEntries[i];
+            if (state === this.sourceMachine.state) {
+                offset += this.sourceMachine.ordering;
+                break;
+            }
+            offset += instructions.length;
+        }
+        this.program.markNext(offset);
     }
     resetTapeOffsets() {
         this.tapes.forEach((tape) => {

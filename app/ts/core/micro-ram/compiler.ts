@@ -1,10 +1,11 @@
 import { safeParseInteger } from '../../utils/parsing';
 import { prefixMethodErrors } from '../../utils/error-handling';
 import { Instruction, InstructionId} from './instruction';
+import {invertMap} from "../../utils/collections";
 
 export class Compiler {
 
-    compile(text: string): [Instruction[], Map<number, number>] {
+    compile(text: string): [Instruction[], Map<number, string>] {
         let instructions: Instruction[] = [];
         const labelMap = new Map<string, number>();
 
@@ -21,15 +22,13 @@ export class Compiler {
 
             if (trimmedLine.endsWith(':')) {
                 const label = trimmedLine.slice(0, -1).trim();
-                if (!label.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) throw new Error(`Neplatný název návěstí na řádku č. ${i}`);
+                if (!label.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) throw new Error(`Neplatný název návěstí na řádku č. ${i} - ${label}`);
                 if (labelMap.has(label)) throw new Error(`Duplikované návěstí '${label}' na řádku č. ${i}`);
                 labelMap.set(label, instrIndex);
             } else {
                 instrIndex++;
             }
         }
-
-        const rowMap = new Map<number, number>();
 
         for (let i = 0; i < lines.length; i++) {
             const originalLine = lines[i];
@@ -54,7 +53,6 @@ export class Compiler {
                 }
             }
 
-            rowMap.set(instructions.length, i);
             instructions.push(instruction);
         }
 
@@ -72,7 +70,7 @@ export class Compiler {
         if (instructions[instructions.length - 1].id !== InstructionId.Halt)
             instructions.push(new Instruction(InstructionId.Halt));
 
-        return [instructions, rowMap];
+        return [instructions, invertMap(labelMap)];
     }
 
     private parseInstruction(line: string): Instruction {

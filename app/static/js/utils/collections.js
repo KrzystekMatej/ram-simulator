@@ -33,4 +33,21 @@ export function mapsEqual(a, b, valueEqual = (x, y) => x === y) {
     }
     return true;
 }
+export function invertMap(inputMap) {
+    const inverted = new Map();
+    for (const [key, value] of inputMap.entries()) {
+        if (inverted.has(value)) {
+            throw new Error(`Duplicate value '${value}' encountered – cannot invert uniquely.`);
+        }
+        inverted.set(value, key);
+    }
+    return inverted;
+}
 export const range = (start, end) => Array.from({ length: end - start }, (_, i) => start + i);
+export function buildIdentityMap(count) {
+    let map = new Map();
+    for (let i = 0; i < count; i++) {
+        map.set(i, i);
+    }
+    return map;
+}

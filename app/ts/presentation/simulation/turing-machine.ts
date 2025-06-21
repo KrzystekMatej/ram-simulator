@@ -1,6 +1,7 @@
 import { Machine as TuringMachine } from "../../core/turing/machine";
-import {UISymbolTape} from "./memory/symbol-tape";
-import {toBlockLatex, toInlineLatex} from "../../utils/latex";
+import { UISymbolTape } from "./memory/symbol-tape";
+import { toInlineLatex } from "../../utils/latex";
+import { UIProgram } from "./program"
 
 
 export class UITuringMachine {
@@ -9,7 +10,7 @@ export class UITuringMachine {
     readonly currentInstruction: HTMLElement;
     readonly currentTransition: HTMLElement;
     readonly tapes: UISymbolTape[];
-    readonly program: HTMLElement;
+    readonly program: UIProgram;
 
     constructor(sourceMachine: TuringMachine) {
         this.sourceMachine = sourceMachine;
@@ -25,8 +26,7 @@ export class UITuringMachine {
             new UISymbolTape(this.sourceMachine.tapes[5], "turing-memory-i"),
             new UISymbolTape(this.sourceMachine.tapes[6], "turing-memory-o")
         ];
-        this.program = document.getElementById("turing-program") as HTMLTextAreaElement;
-
+        this.program = new UIProgram("turing-program");
     }
 
     update(resetTapeOffsets: boolean = true) : void {
@@ -40,16 +40,22 @@ export class UITuringMachine {
             )
         );
 
-        this.tapes.forEach((tape) => tape.update());
-        this.program.innerHTML = Array.from(this.sourceMachine.program)
-            .map(([state, instructions]) =>
-                instructions
-                    .map(instruction => toInlineLatex(instruction.toLatex(state)))
-                    .join("\n")
-            )
-            .join("\n");
         MathJax.typeset([this.currentInstruction, this.currentTransition]);
-        MathJax.typesetPromise([this.program]);
+
+        this.tapes.forEach((tape) => tape.update());
+
+        this.program.setTuringProgram(this.sourceMachine.program);
+        let programEntries = Array.from(this.sourceMachine.program.entries());
+        let offset = 0;
+        for (let i = 0; i < programEntries.length; ++i) {
+            const [state, instructions] = programEntries[i];
+            if (state === this.sourceMachine.state) {
+                offset += this.sourceMachine.ordering;
+                break;
+            }
+            offset += instructions.length;
+        }
+        this.program.markNext(offset);
     }
 
     resetTapeOffsets() {

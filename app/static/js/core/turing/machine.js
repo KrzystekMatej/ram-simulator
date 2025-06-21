@@ -19,6 +19,7 @@ export class Machine {
         this.state = "halt";
         this.program = new Map();
         this.currentInstruction = Instruction.createNop("halt");
+        this.ordering = 0;
     }
     getRegisterContents(tapeId) {
         if (tapeId > TapeId.T)
@@ -78,7 +79,9 @@ export class Machine {
         this.reset();
         this.setProgram(initProgram);
         this.state = "0_start";
-        this.currentInstruction = this.getSatisfied();
+        const [instruction, ordering] = this.getSatisfied();
+        this.currentInstruction = instruction;
+        this.ordering = ordering;
     }
     setProgram(program) {
         this.program.clear();
@@ -102,14 +105,16 @@ export class Machine {
         this.state = this.currentInstruction.target;
         if (this.state.includes("error"))
             throw new Error(`Nastaven chybový stav: ${this.state}`);
-        this.currentInstruction = this.getSatisfied();
+        const [instruction, ordering] = this.getSatisfied();
+        this.currentInstruction = instruction;
+        this.ordering = ordering;
         return this.currentInstruction;
     }
     getSatisfied() {
         let stateInstructions = this.program.get(this.state);
-        for (const instruction of stateInstructions) {
-            if (this.isSatisfied(instruction)) {
-                return instruction;
+        for (let i = 0; i < stateInstructions.length; i++) {
+            if (this.isSatisfied(stateInstructions[i])) {
+                return [stateInstructions[i], i];
             }
         }
         throw new Error(`Nebyla nalezena vhodná instrukce pro podmínky pravidla: ${Instruction.getLeftString(this.state, this.getHeadReads())}!`);

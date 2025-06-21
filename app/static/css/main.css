@@ -152,3 +152,12 @@
 .scroll-btn.right::before{
 }
 
+.program-line {
+}
+
+.program-content {
+    min-height: 10em;
+    overflow-y: auto;
+    white-space: normal;
+    max-height: 20em;
+}

@@ -1,6 +1,7 @@
 import { Instruction, InstructionId } from './instruction.js';
 import { safeParseInteger } from '../../utils/parsing.js';
 import { prefixMethodErrors } from '../../utils/error-handling.js';
+import { invertMap } from "../../utils/collections.js";
 export class Compiler {
     compile(text) {
         let instructions = [];
@@ -18,7 +19,7 @@ export class Compiler {
             if (trimmedLine.endsWith(':')) {
                 const label = trimmedLine.slice(0, -1).trim();
                 if (!label.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/))
-                    throw new Error(`Neplatný název návěstí na řádku č. ${i}`);
+                    throw new Error(`Neplatný název návěstí na řádku č. ${i} - ${label}`);
                 if (labelMap.has(label))
                     throw new Error(`Duplikované návěstí '${label}' na řádku č. ${i}`);
                 labelMap.set(label, instrIndex);
@@ -27,7 +28,6 @@ export class Compiler {
                 instrIndex++;
             }
         }
-        const rowMap = new Map();
         for (let i = 0; i < lines.length; i++) {
             const originalLine = lines[i];
             if (originalLine === '' || originalLine.endsWith(':'))
@@ -37,20 +37,19 @@ export class Compiler {
                     throw new Error(`Návěstí '${label}' není definováno`);
                 return `goto ${labelMap.get(label)}`;
             }).replace(/\bgoto\s*\(([^)]*)\)/g, (match, inner) => match);
-            const instruction = prefixMethodErrors(`Chyba na řádku č. ${i}: ${originalLine} `, this.parseInstruction, this, lineResolved);
+            const instruction = prefixMethodErrors(`Chyba na řádku č. ${i}: ${originalLine} - `, this.parseInstruction, this, lineResolved);
             if (instruction.id === InstructionId.Jump) {
                 const target = instruction.args[0];
                 if (typeof target !== 'number' || target < 0 || target >= instrIndex) {
-                    throw new Error(`Chyba na řádku č. ${i}: ${originalLine} Skok na neplatné návěstí nebo index.`);
+                    throw new Error(`Chyba na řádku č. ${i}: ${originalLine} - Skok na neplatné návěstí nebo index.`);
                 }
             }
             else if (instruction.id === InstructionId.CondJumpConstant || instruction.id === InstructionId.CondJumpRegister) {
                 const target = instruction.args[3];
                 if (typeof target !== 'number' || target < 0 || target >= instrIndex) {
-                    throw new Error(`Chyba na řádku č. ${i}: ${originalLine} Skok na neplatné návěstí nebo index.`);
+                    throw new Error(`Chyba na řádku č. ${i}: ${originalLine} - Skok na neplatné návěstí nebo index.`);
                 }
             }
-            rowMap.set(instructions.length, i);
             instructions.push(instruction);
         }
         if (instructions.length === 0) {
@@ -63,7 +62,7 @@ export class Compiler {
             throw new Error('Instrukce \'init\' je zadána vícekrát.');
         if (instructions[instructions.length - 1].id !== InstructionId.Halt)
             instructions.push(new Instruction(InstructionId.Halt));
-        return [instructions, rowMap];
+        return [instructions, invertMap(labelMap)];
     }
     parseInstruction(line) {
         switch (true) {

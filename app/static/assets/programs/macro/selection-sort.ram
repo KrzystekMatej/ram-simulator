@@ -7,7 +7,7 @@ R3 = R1                     //var item pointer
 
 input_loop:
     R4 = READ()                 //temp input value
-    [R3] = R3
+    [R3] = R4
     R3 = R3 + 1
     if (R3 < R2) goto input_loop
     goto prepare_sort
@@ -15,7 +15,7 @@ input_loop:
 
 prepare_sort:
     R3 = R1                     //inner index
-    goto outer_loop_cond:
+    goto outer_loop_cond
 
 outer_loop_cond:
     if (R3 < R2) goto outer_loop_start

@@ -4,6 +4,7 @@ import {
     InstructionId as MicroInstructionId
 } from '../micro-ram/instruction';
 import {Instruction as MacroInstruction} from './instruction';
+import {invertMap} from "../../utils/collections";
 
 export class ToMicroTranspiler {
 
@@ -150,12 +151,18 @@ export class ToMicroTranspiler {
     transpile(ramInstructions: MacroInstruction[]): [MicroInstruction[], Map<number, number>] {
         let microInstructions: MicroInstruction[] = []
         let indexMap: Map<number, number> = new Map();
+        let microMacroMap: Map<number, number> = new Map();
 
 
         for (let i = 0; i < ramInstructions.length; i++)
         {
-            indexMap.set(i, microInstructions.length);
             const transpiled: MicroInstruction[] = ToMicroTranspiler.handlers[ramInstructions[i].id].apply(this, ramInstructions[i].args);
+
+            indexMap.set(i, microInstructions.length);
+            for (let j = 0; j < transpiled.length; j++) {
+                microMacroMap.set(microInstructions.length + j, i);
+            }
+
             microInstructions.push(...transpiled);
         }
 
@@ -167,6 +174,6 @@ export class ToMicroTranspiler {
                 instruction.args[1] = indexMap.get(instruction.args[1]);
         }
 
-        return [microInstructions, indexMap];
+        return [microInstructions, microMacroMap];
     }
 }

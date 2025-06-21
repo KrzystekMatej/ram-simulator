@@ -162,25 +162,21 @@
             <div class="card-body d-flex gap-3 flex-grow-1" id="ram-programs">
                 <div class="d-flex flex-column flex-fill">
                     <div class="fw-bold mb-2">Makro RAM</div>
-                    <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="ram-program-macro"></textarea>
+                    <div class="flex-grow-1 rounded-0 border p-2 bg-white program-content" id="ram-program-macro">
+                    </div>
                     <div class="mt-2 row gx-2">
                         <div class="col">
-                            <button class="btn btn-dark-hover text-white w-100 rounded-0" id="load-macro-button">Načíst ze souboru</button>
-                        </div>
-                        <div class="col">
-                            <button class="btn btn-dark-hover text-white w-100 rounded-0" id="compile-macro-button">Přeložit</button>
+                            <button class="btn btn-dark-hover text-white w-100 rounded-0" id="load-macro-button">Načíst program</button>
                         </div>
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-fill">
                     <div class="fw-bold mb-2">Mikro RAM</div>
-                    <textarea class="form-control flex-grow-1 rounded-0" style="resize: none;" rows="10" id="ram-program-micro"></textarea>
+                    <div class="flex-grow-1 rounded-0 border p-2 bg-white program-content" id="ram-program-micro">
+                    </div>
                     <div class="mt-2 row gx-2">
                         <div class="col">
-                            <button class="btn btn-dark-hover text-white w-100 rounded-0" id="load-micro-button">Načíst ze souboru</button>
-                        </div>
-                        <div class="col">
-                            <button class="btn btn-dark-hover text-white w-100 rounded-0" id="compile-micro-button">Přeložit</button>
+                            <button class="btn btn-dark-hover text-white w-100 rounded-0" id="load-micro-button">Načíst program</button>
                         </div>
                     </div>
                 </div>
@@ -506,10 +502,8 @@
         <div class="card border rounded-0 mb-3 flex-grow-1 d-flex flex-column">
             <div class="card-header bg-light fw-bold">Přechodová funkce vykonávané RAM instrukce</div>
             <div class="card-body d-flex flex-column flex-grow-1" id="turing-program-container">
-                <div class="flex-grow-1 rounded-0 border p-2 bg-white" id="turing-program"
-                     style="min-height: 10em; overflow-y: auto; white-space: pre-wrap; max-height: 20em;">
+                <div class="flex-grow-1 rounded-0 border p-2 bg-white program-content" id="turing-program">
                 </div>
-
                 <div class="mt-2 row gx-2">
                     <div class="col">
                         <button class="btn btn-dark-hover text-white w-100 rounded-0" id="show-compact-turing-program">

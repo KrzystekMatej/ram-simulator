@@ -3,9 +3,13 @@ export class ToMicroTranspiler {
     transpile(ramInstructions) {
         let microInstructions = [];
         let indexMap = new Map();
+        let microMacroMap = new Map();
         for (let i = 0; i < ramInstructions.length; i++) {
-            indexMap.set(i, microInstructions.length);
             const transpiled = ToMicroTranspiler.handlers[ramInstructions[i].id].apply(this, ramInstructions[i].args);
+            indexMap.set(i, microInstructions.length);
+            for (let j = 0; j < transpiled.length; j++) {
+                microMacroMap.set(microInstructions.length + j, i);
+            }
             microInstructions.push(...transpiled);
         }
         for (const instruction of microInstructions) {
@@ -14,7 +18,7 @@ export class ToMicroTranspiler {
             else if (instruction.id === MicroInstructionId.CondJump)
                 instruction.args[1] = indexMap.get(instruction.args[1]);
         }
-        return [microInstructions, indexMap];
+        return [microInstructions, microMacroMap];
     }
 }
 ToMicroTranspiler.handlers = [

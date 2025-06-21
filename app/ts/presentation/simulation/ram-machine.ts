@@ -6,6 +6,7 @@ import {Compiler as MacroCompiler} from "../../core/macro-ram/compiler";
 import {ToMicroTranspiler} from "../../core/macro-ram/to-micro-transpiler";
 import {Instruction as MicroInstruction} from "../../core/micro-ram/instruction";
 import {toInlineLatex} from "../../utils/latex";
+import {UIProgram} from "./program";
 
 export class UIRamMachine {
     readonly sourceMachine: RamMachine;
@@ -23,11 +24,13 @@ export class UIRamMachine {
 
     readonly currentInstruction: HTMLElement;
 
-    readonly program: { macro: HTMLTextAreaElement, micro: HTMLTextAreaElement };
+    readonly program: { macro: UIProgram, micro: UIProgram };
 
     readonly macroCompiler: MacroCompiler;
     readonly microCompiler: MicroCompiler;
     readonly toMicroTranspiler: ToMicroTranspiler;
+
+    microMacroMap: Map<number, number> | undefined;
 
 
     constructor(source: RamMachine) {
@@ -43,8 +46,8 @@ export class UIRamMachine {
         this.output = new UINumberTape(this.sourceMachine.output, "ram-memory-o");
         this.currentInstruction = document.getElementById("ram-instruction")!;
         this.program = {
-            macro: document.getElementById("ram-program-macro") as HTMLTextAreaElement,
-            micro: document.getElementById("ram-program-micro") as HTMLTextAreaElement
+            macro: new UIProgram("ram-program-macro"),
+            micro: new UIProgram("ram-program-micro")
         };
 
         this.macroCompiler = new MacroCompiler();
@@ -56,14 +59,21 @@ export class UIRamMachine {
         if (!resetTapeOffsets) this.resetTapeOffsets();
 
         this.ip.textContent = `IP: ${this.sourceMachine.ip.toString()}`;
+        this.currentInstruction.innerHTML = toInlineLatex(this.sourceMachine.currentInstruction.toLatex());
+        MathJax.typeset([this.currentInstruction]);
+
         this.A.textContent = this.sourceMachine.A.toString();
         this.B.textContent = this.sourceMachine.B.toString();
         this.C.textContent = this.sourceMachine.C.toString();
         this.memory.update();
         this.input.update();
         this.output.update();
-        this.currentInstruction.innerHTML = toInlineLatex(this.sourceMachine.currentInstruction.toLatex());
-        MathJax.typeset([this.currentInstruction]);
+
+        if (this.microMacroMap !== undefined) {
+            this.program.macro.markNext(this.microMacroMap.get(this.sourceMachine.ip) as number);
+        }
+
+        this.program.micro.markNext(this.sourceMachine.ip);
     }
 
     resetTapeOffsets() {
@@ -71,19 +81,20 @@ export class UIRamMachine {
         this.output.headOffset = 0;
     }
 
-    compileMacro() : MicroInstruction[] {
-        const rawProgram: string = this.program.macro.value ?? '';
-        const [macroProgram, rowMap] = this.macroCompiler.compile(rawProgram);
-        this.program.macro.value = macroProgram.map((instruction) => instruction.toString()).join('\n');
-        const [microProgram, _] = this.toMicroTranspiler.transpile(macroProgram);
-        this.program.micro.value = microProgram.map((instruction) => instruction.toString()).join('\n');
+    compileMacro(rawProgram: string) : MicroInstruction[] {
+        const [macroProgram, labelMapMacro] = this.macroCompiler.compile(rawProgram);
+        this.program.macro.setRamProgram(macroProgram, labelMapMacro);
+        const [microProgram, microMacroMap] = this.toMicroTranspiler.transpile(macroProgram);
+        this.microMacroMap = microMacroMap;
+        this.program.micro.setRamProgram(microProgram);
         return microProgram;
     }
 
-    compileMicro() : MicroInstruction[] {
-        const rawProgram: string = this.program.micro.value ?? '';
-        const [microProgram, rowMap] = this.microCompiler.compile(rawProgram);
-        this.program.micro.value = microProgram.map((instruction) => instruction.toString()).join('\n');
+    compileMicro(rawProgram: string) : MicroInstruction[] {
+        const [microProgram, labelMap] = this.microCompiler.compile(rawProgram);
+        this.program.micro.setRamProgram(microProgram, labelMap);
+        this.microMacroMap = undefined;
+        this.program.macro.clean();
         return microProgram;
     }
 }

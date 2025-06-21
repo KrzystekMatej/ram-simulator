@@ -19,7 +19,13 @@ export class Instruction {
         this.id = id;
         this.args = args;
     }
-    toString() {
+    static getLabel(numLabel, labelMap) {
+        let label = `${numLabel}`;
+        if (labelMap.has(numLabel))
+            label = `\\text{${labelMap.get(numLabel)}}`;
+        return label;
+    }
+    toString(labelMap = new Map()) {
         switch (this.id) {
             case InstructionId.Init:
                 return `init [${this.args.map((n) => n.toString()).join(', ')}]`;
@@ -36,9 +42,9 @@ export class Instruction {
             case InstructionId.Arithmetic:
                 return `A = A ${this.args[0]} B`;
             case InstructionId.Jump:
-                return `goto ${this.args[0]}`;
+                return `goto ${Instruction.getLabel(this.args[0], labelMap)}`;
             case InstructionId.CondJump:
-                return `if (A ${this.args[0]} 0) goto ${this.args[1]}`;
+                return `if (A ${this.args[0]} 0) goto ${Instruction.getLabel(this.args[1], labelMap)}`;
             case InstructionId.Read:
                 return `A = READ()`;
             case InstructionId.Write:
@@ -49,7 +55,7 @@ export class Instruction {
                 throw Error(`Micro instruction with invalid id - ${this.id}.`);
         }
     }
-    toLatex() {
+    toLatex(labelMap = new Map()) {
         switch (this.id) {
             case InstructionId.Init:
                 return `\\text{init}\\;[${this.args.map(n => n.toString()).join(',\\;')}]`;
@@ -66,9 +72,9 @@ export class Instruction {
             case InstructionId.Arithmetic:
                 return `A = A\\;${this.args[0]}\\;B`;
             case InstructionId.Jump:
-                return `\\textbf{goto}\\;${this.args[0]}`;
+                return `\\textbf{goto}\\;${Instruction.getLabel(this.args[0], labelMap)}`;
             case InstructionId.CondJump:
-                return `\\textbf{if}\\;(A\\;${this.args[0]}\\;0)\\;\\textbf{goto}\\;${this.args[1]}`;
+                return `\\textbf{if}\\;(A\\;${this.args[0]}\\;0)\\;\\textbf{goto}\\;${Instruction.getLabel(this.args[1], labelMap)}`;
             case InstructionId.Read:
                 return `A = \\text{READ}()`;
             case InstructionId.Write:

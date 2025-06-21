@@ -21,6 +21,7 @@ export class Machine {
     state: string = "halt";
     program: Map<string, Instruction[]> = new Map();
     currentInstruction: Instruction = Instruction.createNop("halt");
+    ordering: number = 0;
 
     getRegisterContents(tapeId: TapeId): number {
         if (tapeId > TapeId.T) throw new Error(`The contents of tape ${tapeId} can't be described as a number!`);
@@ -88,7 +89,9 @@ export class Machine {
         this.reset();
         this.setProgram(initProgram);
         this.state = "0_start";
-        this.currentInstruction = this.getSatisfied();
+        const [instruction, ordering] = this.getSatisfied();
+        this.currentInstruction = instruction;
+        this.ordering = ordering;
     }
 
     setProgram(program: Map<string, Instruction[]>): void {
@@ -113,16 +116,18 @@ export class Machine {
 
         this.state = this.currentInstruction.target;
         if (this.state.includes("error")) throw new Error(`Nastaven chybový stav: ${this.state}`);
-        this.currentInstruction = this.getSatisfied();
+        const [instruction, ordering] = this.getSatisfied();
+        this.currentInstruction = instruction;
+        this.ordering = ordering;
         return this.currentInstruction;
     }
 
-    getSatisfied(): Instruction {
+    getSatisfied(): [Instruction, number] {
         let stateInstructions: TuringInstruction[] = this.program.get(this.state) as TuringInstruction[];
 
-        for (const instruction of stateInstructions) {
-            if (this.isSatisfied(instruction)) {
-                return instruction;
+        for (let i = 0; i < stateInstructions.length; i++) {
+            if (this.isSatisfied(stateInstructions[i])) {
+                return [stateInstructions[i], i];
             }
         }
 

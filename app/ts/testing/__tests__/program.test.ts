@@ -6,7 +6,7 @@ import {
 import fs from "fs";
 import path from "path";
 import {factorial, readProgramFromFile} from "../helpers";
-import {arraysEqual} from "../../utils/collections";
+import {arraysEqual, range} from "../../utils/collections";
 
 
 let simulationTester: SimulationTester;
@@ -65,8 +65,12 @@ describe('Micro programs', () => {
 });
 
 describe('Macro programs', () => {
+    let testSortList1 = range(-50, 50, 3);
+    let testSortList2 = range(50, -50, -3);
+
     const examples: [string, any[]][] = [
         ['exponential-iterator', [
+            [[0], [2]],
             [[1], [4]],
             [[2], [16]],
             [[3], [256]],
@@ -102,6 +106,14 @@ describe('Macro programs', () => {
             [[4, -1, -2, -3, -4], [-10]],
             [[5, 10, 20, 30, 40, 50], [150]],
             [[6, 1, 1, 1, 1, 1, 1], [6]],
+        ]], ['selection-sort', [
+            [[0], []],
+            [[1, 0], [0]],
+            [[2, -3, 4], [-3, 4]],
+            [[2, 4, -3], [-3, 4]],
+            [[5, 17, 6, -23, 134, 12], [-23, 6, 12, 17, 134]],
+            [[testSortList1.length, ...testSortList1], testSortList1.sort((a, b) => a - b)],
+            [[testSortList2.length, ...testSortList2], testSortList2.sort((a, b) => a - b)]
         ]]
     ];
 
@@ -109,12 +121,16 @@ describe('Macro programs', () => {
         const [programName, ios] = example;
         test(`Testing program ${programName}`, () => {
             const instructions = readProgramFromFile('macro', programName);
+            if (programName === 'selection-sort') {
+                let a = 0;
+            }
 
             ios.forEach((io) => {
                 const [inputs, expectedOutputs] = io;
                 instructions[0] = new MicroInstruction(MicroInstructionId.Init, inputs);
                 simulationTester.initialize(instructions);
                 simulationTester.executeAllRam();
+                let a = simulationTester.ramMachine.output.getFullContents(0)[1];
                 expect(arraysEqual(simulationTester.ramMachine.output.getFullContents(0)[1], expectedOutputs))
                     .toBe(true);
             })
