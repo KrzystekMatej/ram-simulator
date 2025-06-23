@@ -3,13 +3,13 @@ from django.conf import settings
 from django.shortcuts import render
 from django.templatetags.static import static
 
-if settings.DEBUG:
-    APP_STATIC_PROGRAMS_ROOT = settings.BASE_DIR / 'app' / 'static' / 'assets' / 'programs'
-else:
-    APP_STATIC_PROGRAMS_ROOT = settings.STATIC_ROOT / 'assets' / 'programs'
-
 def get_program_files_list(program_type: str):
-    target_dir_pathlib = APP_STATIC_PROGRAMS_ROOT / program_type
+    if settings.DEBUG:
+        root = settings.BASE_DIR / 'app' / 'static' / 'assets' / 'programs'
+    else:
+        root = settings.STATIC_ROOT / 'assets' / 'programs'
+
+    target_dir_pathlib = root / program_type
     files = []
     if target_dir_pathlib.is_dir():
         try:
