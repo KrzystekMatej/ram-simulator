@@ -6,6 +6,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      SECRET_KEY: 'test-key'
+      ENVIRONMENT: 'development'
+      ALLOWED_HOSTS: 'localhost,127.0.0.1'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
