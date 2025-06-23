@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn service for ram-simulator
+After=network.target
+
+[Service]
+User=django
+Group=www-data
+WorkingDirectory=/home/django/ram-simulator
+Environment="DJANGO_SETTINGS_MODULE=project.settings"
+EnvironmentFile=/home/django/ram-simulator/project/.env
+ExecStart=/home/django/ram-simulator/venv/bin/gunicorn project.wsgi:application --bind 127.0.0.1:8000
+
+[Install]
+WantedBy=multi-user.target

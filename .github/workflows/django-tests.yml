@@ -10,6 +10,7 @@ jobs:
       SECRET_KEY: 'test-key'
       ENVIRONMENT: 'development'
       ALLOWED_HOSTS: 'localhost,127.0.0.1'
+      USE_HTTPS: 'False'
 
     steps:
       - name: Checkout code

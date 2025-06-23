@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    server_name 91.99.201.161;
+
+    location /static/ {
+        alias /home/django/ram-simulator/staticfiles/;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        include proxy_params;
+        proxy_redirect off;
+    }
+}
