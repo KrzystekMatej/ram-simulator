@@ -59,3 +59,6 @@ app/migrations/
 
 # Jest
 coverage/
+
+# Env variables
+project/.env

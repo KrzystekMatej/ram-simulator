@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn service for $PROJECT_NAME
+After=network.target
+
+[Service]
+User=$LINUX_USER
+Group=www-data
+WorkingDirectory=$PROJECT_PATH
+Environment="DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS"
+EnvironmentFile=$ENV_FILE
+ExecStart=$VENV_PATH/bin/gunicorn $WSGI_PATH:application --bind 127.0.0.1:8000
+
+[Install]
+WantedBy=multi-user.target

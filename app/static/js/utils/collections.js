@@ -43,7 +43,32 @@ export function invertMap(inputMap) {
     }
     return inverted;
 }
-export const range = (start, end) => Array.from({ length: end - start }, (_, i) => start + i);
+export function range(start, end, step = 1) {
+    if (step === 0) {
+        throw new Error("Step can't be 0.");
+    }
+    if (end === undefined) {
+        end = start;
+        start = 0;
+    }
+    const isAscending = step > 0;
+    const conditionFails = (isAscending && start >= end) || (!isAscending && start <= end);
+    if (conditionFails) {
+        throw new Error(`Combination start=${start}, end=${end}, step=${step} is not consistent.`);
+    }
+    const result = [];
+    if (isAscending) {
+        for (let i = start; i < end; i += step) {
+            result.push(i);
+        }
+    }
+    else {
+        for (let i = start; i > end; i += step) {
+            result.push(i);
+        }
+    }
+    return result;
+}
 export function buildIdentityMap(count) {
     let map = new Map();
     for (let i = 0; i < count; i++) {

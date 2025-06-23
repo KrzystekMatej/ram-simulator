@@ -3,7 +3,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.templatetags.static import static
 
-APP_STATIC_PROGRAMS_ROOT = settings.BASE_DIR / 'app' / 'static' / 'assets' / 'programs'
+APP_STATIC_PROGRAMS_ROOT = settings.STATICFILES_DIRS[0] / 'assets' / 'programs'
 
 def get_program_files_list(program_type: str):
     target_dir_pathlib = APP_STATIC_PROGRAMS_ROOT / program_type
@@ -30,5 +30,6 @@ def index(request):
         'micro_programs': micro_files,
         'macro_programs_base_url': static('assets/programs/macro/'),
         'micro_programs_base_url': static('assets/programs/micro/'),
+        'turing_sets_url': static('assets/turing-sets.txt'),
     }
     return render(request, 'index.html', context)
