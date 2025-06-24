@@ -28,7 +28,6 @@ export class UISimulator {
         document.getElementById('load-micro-button')!.addEventListener('click', () => this.loadMicro());
 
         document.getElementById('show-compact-turing-program')!.addEventListener('click', () => this.showCompactTuringProgram());
-        document.getElementById('show-full-turing-program')!.addEventListener('click', () => this.showFullTuringProgram());
     }
 
     ramStep() {
@@ -104,10 +103,6 @@ export class UISimulator {
                     ).join("")
             ).join("");
         turingProgramModal.show("Celá přechodová funkce programu ve zkrácené formě", latex)
-    }
-
-    showFullTuringProgram(): void {
-
     }
 
     reset() {

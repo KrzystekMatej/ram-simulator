@@ -15,7 +15,6 @@ export class UISimulator {
         document.getElementById('load-macro-button').addEventListener('click', () => this.loadMacro());
         document.getElementById('load-micro-button').addEventListener('click', () => this.loadMicro());
         document.getElementById('show-compact-turing-program').addEventListener('click', () => this.showCompactTuringProgram());
-        document.getElementById('show-full-turing-program').addEventListener('click', () => this.showFullTuringProgram());
     }
     ramStep() {
         try {
@@ -84,8 +83,6 @@ export class UISimulator {
             .map((ramInst, ip) => Array.from(this.simulator.transpiler.transpile(ramInst, ip).entries())
             .map(([state, instructions]) => instructions.map(turingInst => `<div>${toInlineLatex(turingInst.toLatex(state))}</div>`).join("")).join("")).join("");
         turingProgramModal.show("Celá přechodová funkce programu ve zkrácené formě", latex);
-    }
-    showFullTuringProgram() {
     }
     reset() {
         this.simulator.reset();
